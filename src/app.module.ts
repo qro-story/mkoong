@@ -1,0 +1,89 @@
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
+import * as Joi from 'joi';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import helmet from 'helmet';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HttpExceptionFilter } from 'libs/core/filters/http.exception.filter';
+import { CustomValidationPipe } from 'libs/core/pipes/custom.validation.pipe';
+import { ParamsValidationPipe } from 'libs/core/pipes/param.validation.pipe';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      validationSchema: Joi.object({
+        SERVER_PORT: Joi.number().required(), // 서버 포트
+        // Mysql DB 설정
+        DB_MYSQL_HOST: Joi.string().required(), // Mysql DB Host 경로
+        DB_MYSQL_PORT: Joi.number().max(60000).required(), // Mysql DB Port 번호
+        DB_MYSQL_DATABASE: Joi.string().required(), // Mysql DB 이름
+        DB_MYSQL_USERNAME: Joi.string().required(), // Mysql DB 사용자 이름
+        DB_MYSQL_PASSWORD: Joi.string().required(), // Mysql DB 비밀번호
+        DB_MYSQL_CHARSET: Joi.string().required(), // Mysql DB 문자셋
+        DB_MYSQL_TIMEZONE: Joi.string().required(), // Mysql DB 타임존
+      }),
+    }),
+    // TypeOrmModule.forRootAsync({
+    //   imports:[ConfigModule],
+    //   inject: [ConfigService],
+
+    //   useFactory : databaseProviders
+
+    // })
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('DB_MYSQL_HOST'),
+        port: configService.get<number>('DB_MYSQL_PORT'),
+        username: configService.get<string>('DB_MYSQL_USERNAME'),
+        password: configService.get<string>('DB_MYSQL_PASSWORD'),
+        database: configService.get<string>('DB_MYSQL_DATABASE'),
+        charset: configService.get<string>('DB_MYSQL_CHARSET'),
+        timezone: configService.get<string>('DB_MYSQL_TIMEZONE'),
+        logging: true,
+        // entities: [__dirname '/**/*.entity{.ts,.js}'],
+        // entities: [Posts, Channels, Videos, Thumbnails, Users],
+        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        // migrations: [path.join(__dirname + '/migrations/*{.ts,.js}')],
+        // migrationsTableName: 'migrations',
+        // synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false),
+      }),
+    }),
+  ],
+  controllers: [AppController],
+  providers: [
+    AppService,
+    { provide: APP_INTERCEPTOR, useClass: HttpExceptionFilter },
+    {
+      provide: APP_FILTER,
+      useValue: new HttpExceptionFilter(),
+    },
+    {
+      provide: APP_PIPE,
+      useValue: new CustomValidationPipe({
+        forbidNonWhitelisted: true, // DTO에 정의되지 않은 값이 넘어오면 request 자체 block
+        transform: true, // 클라이언트에서 값을 받자마자 타입을 정의한대로 자동 형변환
+        transformOptions: { enableImplicitConversion: true },
+      }),
+    },
+    {
+      provide: APP_PIPE,
+      useClass: ParamsValidationPipe,
+    },
+  ],
+})
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(helmet()).forRoutes('*');
+  }
+}

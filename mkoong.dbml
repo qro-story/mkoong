@@ -1,0 +1,75 @@
+// 사용자 테이블
+Table User {
+  id int [pk, increment, note: '사용자 ID']
+  username varchar(50) [not null, unique, note: '사용자명']
+  phone_number varchar(20) [unique, note: '핸드폰 번호']
+  birth date [note: '생년월일']
+  gender varchar(2) [note: '성별']
+  nickname varchar(50) [note: 'profile의 닉네임']
+  e_i_ratio int [not null, note: 'E와 I의 비율']
+  n_s_ratio int [not null, note: 'N과 S의 비율']
+  f_t_ratio int [not null, note: 'F와 T의 비율']
+  p_j_ratio int [not null, note: 'P와 J의 비율']
+  created_at timestamp [default: `now()`, note: '생성 일자']
+  updated_at timestamp [default: `now()`, note: '업데이트 일자']
+  deleted_at timestamp [note: '삭제 날짜']
+}
+
+Table PassportAuth {
+  id int [pk, increment, note: '소셜 인증 ID']
+  user_id int [not null, ref: > User.id, note: '사용자 ID']
+  provider varchar(50) [not null, note: '소셜 미디어 제공자 (예: Google, Facebook)']
+  email varchar(100) [not null, unique, note: '이메일']
+  password varchar(100) [not null, note: '비밀번호']
+  provider_user_id varchar(100) [not null, note: '제공자의 사용자 ID']
+  access_token varchar(255) [note: '접근 토큰']
+  refresh_token varchar(255) [note: '갱신 토큰']
+  created_at timestamp [default: `now()`, note: '생성 일자']
+  updated_at timestamp [default: `now()`, note: '업데이트 일자']
+  deleted_at timestamp [note: '삭제 날짜']
+}
+
+// 커뮤니티 게시물 테이블
+Table Post {
+  id int [pk, increment, note: '게시물 ID']
+  user_id int [not null, ref: > User.id, note: '사용자 ID']
+  title varchar(255) [not null, note: '제목']
+  content text [not null, note: '내용']
+  created_at timestamp [default: `now()`, note: '생성 일자']
+  updated_at timestamp [default: `now()`, note: '업데이트 일자']
+  deleted_at timestamp [note: '삭제 날짜']
+}
+
+// 댓글 테이블
+Table Comment {
+  id int [pk, increment, note: '댓글 ID']
+  post_id int [not null, ref: > Post.id, note: '게시물 ID']
+  parent_id int [null, ref: > Comment.id, note: '상위 댓글 ID']
+  comment_group_id int [default: 0, note: '댓글을 그룹핑하기 위한 id']
+  user_id int [not null, ref: > User.id, note: '사용자 ID']
+  content text [not null, note: '댓글 내용']
+  created_at timestamp [default: `now()`, note: '생성 일자']
+  updated_at timestamp [default: `now()`, note: '업데이트 일자']
+  deleted_at timestamp [note: '삭제 날짜']
+}
+
+// post와 user의 relation Table
+Table PostReaction {
+  id int [pk, increment, note: '반응 ID']
+  post_id int [not null, ref: > Post.id, note: '게시물 ID']
+  user_id int [not null, ref: > User.id, note: '사용자 ID']
+  reaction_type enum('like', 'dislike') [not null, note: '반응 유형']
+  created_at timestamp [default: `now()`, note: '생성 일자']
+  updated_at timestamp [default: `now()`, note: '업데이트 일자']
+  deleted_at timestamp [note: '삭제 날짜']
+}
+
+// 친구 관계 테이블
+Table FriendShip {
+  id int [pk, increment, note: '친구 관계 ID']
+  user_id int [not null, ref: > User.id, note: '사용자 ID']
+  friend_id int [not null, ref: > User.id, note: '친구 ID']
+  created_at timestamp [default: `now()`, note: '생성 일자']
+  updated_at timestamp [default: `now()`, note: '업데이트 일자']
+  deleted_at timestamp [note: '삭제 날짜']
+}

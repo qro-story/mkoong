@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0
+    ports:
+      - ${DB_MYSQL_PORT}:3306
+
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${DB_MYSQL_DATABASE}
+
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+    command:
+      - --connect-timeout=31536000
+      - --net_write_timeout=600
+      - --max_allowed_packet=16M
+      - --collation-server=utf8mb4_general_ci
+      - --default-time-zone=${DB_MYSQL_TIMEZONE}
+      - --character-set-server=${DB_MYSQL_CHARSET}
+
+  redis:
+    image: redis:7.0
+    ports:
+      - ${REDIS_PORT}:6379
