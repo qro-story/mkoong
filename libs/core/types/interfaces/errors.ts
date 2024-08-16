@@ -2,8 +2,8 @@ import { HttpStatus } from '@nestjs/common';
 import { STATUS_CODES } from 'http';
 
 export interface ErrorInterface {
-  errorCode: number;
   error: ERROR;
+  errorCode?: number;
   message?: string;
 }
 
@@ -18,7 +18,6 @@ export class CommonError extends Error {
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, CommonError);
     }
-
     this.error = error;
     this.errorCode =
       errorCode || ERROR_CODE[error] || HttpStatus.INTERNAL_SERVER_ERROR;

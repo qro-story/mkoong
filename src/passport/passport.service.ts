@@ -7,6 +7,8 @@ import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePassportDto } from './dto/passport.dto';
+import { CommonError, ERROR } from '@libs/core/types';
+import * as bcrypt from 'bcrypt'; // bcrypt 라이브러리 추가
 
 @Injectable()
 export class PassportService extends AbstractRepository<PassportAuth> {
@@ -25,6 +27,20 @@ export class PassportService extends AbstractRepository<PassportAuth> {
         email: createPassportDto.email,
       },
     });
+    if (user) {
+      throw new CommonError({
+        error: ERROR.ALREADY_USED_DATA,
+      });
+    }
+    // 비밀번호 암호화
+    const salt = await bcrypt.genSalt();
+    createPassportDto.password = await bcrypt.hash(
+      createPassportDto.password,
+      salt,
+    );
+
+    return await this.passportAuthRepository.save(createPassportDto);
+    // todo 이후에 비밀번호 암호화 해야함
   }
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -33,9 +49,11 @@ export class PassportService extends AbstractRepository<PassportAuth> {
         email,
       },
     });
-    if (user && user.password === password) {
+
+    if (user && (await bcrypt.compare(password, user.password))) {
       const { password, ...result } = user;
       return result;
     }
+    return null;
   }
 }

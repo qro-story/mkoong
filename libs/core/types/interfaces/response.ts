@@ -65,7 +65,7 @@ export function customResponseForException(
       status: ResponseStatus.ERROR,
       statusCode: commonError?.errorCode,
       message: commonError?.errorCode ?? exception?.message ?? 'ERROR',
-      data: commonError?.data,
+      data: commonError?.error,
     });
   } else if (exception?.response) {
     response = customResponse({

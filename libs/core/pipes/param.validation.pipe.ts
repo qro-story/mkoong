@@ -46,9 +46,9 @@ export class ParamsValidationPipe implements PipeTransform {
           `실패했어요`;
         // throw new Error(message);
 
-        throw new CommonError(ERROR.INSUFFICIENT_PARAMS, {
+        throw new CommonError({
+          error: ERROR.INSUFFICIENT_PARAMS,
           message: message,
-          reasons: reasons,
         });
       } else {
         throw error;

@@ -169,7 +169,8 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
 
     const entity = await this.getRepository().findOne(options);
     if (!entity) {
-      throw new CommonError(ERROR.NO_EXISTS_DATA, {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
         message: `${this.getRepository.name}에 해당하는 데이터가 존재하지 않습니다.`,
       });
     }
@@ -204,7 +205,7 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     option?: { hardDelete?: boolean },
   ): Promise<UpdateResult | DeleteResult> {
     if (!where || !Object.keys(where)?.length) {
-      throw new CommonError(ERROR.NOT_ALLOWED_REMOVE_ALL);
+      throw new CommonError({ error: ERROR.NOT_ALLOWED_REMOVE_ALL });
     }
     if (option?.hardDelete) {
       return await this.getRepository().delete(where as FindOptionsWhere<any>);
@@ -220,7 +221,10 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     option?: FindOneOptions<TEntity>,
   ): Promise<TEntity> {
     if (typeof id === 'undefined' || id === null) {
-      throw new CommonError(ERROR.INVALID_PARAMS, { id: id });
+      throw new CommonError({
+        error: ERROR.INVALID_PARAMS,
+        message: `id가 존재하지 않습니다.`,
+      });
     }
 
     const where: any = { id: id };
@@ -229,7 +233,10 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
       ...option,
     });
     if (!model) {
-      throw new CommonError(ERROR.NO_EXISTS_DATA, { id: id });
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
+        message: `${this.getRepository.name}에 해당하는 데이터가 존재하지 않습니다.`,
+      });
     }
     return model;
   }
