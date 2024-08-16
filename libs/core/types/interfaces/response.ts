@@ -63,7 +63,7 @@ export function customResponseForException(
 
     response = customResponse({
       status: ResponseStatus.ERROR,
-      statusCode: commonError?.statusCode,
+      statusCode: commonError?.errorCode,
       message: commonError?.errorCode ?? exception?.message ?? 'ERROR',
       data: commonError?.data,
     });

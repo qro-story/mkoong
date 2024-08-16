@@ -13,7 +13,7 @@ import {
   UpdateResult,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { CommonError, ERROR_CODE, OrderType, Pagination } from '../types';
+import { CommonError, ERROR, OrderType, Pagination } from '../types';
 import { PaginationDto } from '../types/dtos/pagination.dto';
 import { MyLogger } from '../helpers/logger.helper';
 import { AbstractEntity } from './abstract.entity';
@@ -74,7 +74,7 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
       },
     });
     if (id) {
-      throw new ConflictException(ERROR_CODE.ALREADY_USED_DATA);
+      throw new ConflictException(ERROR.ALREADY_USED_DATA);
     }
     return await repository.save(entity);
   }
@@ -156,6 +156,27 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     return await this.getRepository().findOne(options);
   }
 
+  async findOneThrowException(
+    options: FindOneOptions<TEntity> = {},
+  ): Promise<TEntity> {
+    if (!options?.relations) {
+      Object.assign(options, {
+        loadRelationIds: {
+          disableMixedMap: true,
+        },
+      });
+    }
+
+    const entity = await this.getRepository().findOne(options);
+    if (!entity) {
+      throw new CommonError(ERROR.NO_EXISTS_DATA, {
+        message: `${this.getRepository.name}에 해당하는 데이터가 존재하지 않습니다.`,
+      });
+    }
+
+    return entity;
+  }
+
   async updateById(
     id: number,
     entity: QueryDeepPartialEntity<TEntity>,
@@ -183,7 +204,7 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     option?: { hardDelete?: boolean },
   ): Promise<UpdateResult | DeleteResult> {
     if (!where || !Object.keys(where)?.length) {
-      throw new CommonError(ERROR_CODE.NOT_ALLOWED_REMOVE_ALL);
+      throw new CommonError(ERROR.NOT_ALLOWED_REMOVE_ALL);
     }
     if (option?.hardDelete) {
       return await this.getRepository().delete(where as FindOptionsWhere<any>);
@@ -199,7 +220,7 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     option?: FindOneOptions<TEntity>,
   ): Promise<TEntity> {
     if (typeof id === 'undefined' || id === null) {
-      throw new CommonError(ERROR_CODE.INVALID_PARAMS, { id: id });
+      throw new CommonError(ERROR.INVALID_PARAMS, { id: id });
     }
 
     const where: any = { id: id };
@@ -208,7 +229,7 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
       ...option,
     });
     if (!model) {
-      throw new CommonError(ERROR_CODE.NO_EXISTS_DATA, { id: id });
+      throw new CommonError(ERROR.NO_EXISTS_DATA, { id: id });
     }
     return model;
   }

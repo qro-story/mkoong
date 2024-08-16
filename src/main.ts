@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
 
-const logger = new MyLogger('app:2hon');
+const logger = new MyLogger('app:mkoong');
 async function bootstrap() {
   logger.log('Creating mkoong Application Instance');
 
@@ -43,7 +43,7 @@ async function bootstrap() {
   logger.log(`Mkoong Server is running on Port test ${port}`);
   logger.log(
     path
-      .join(__dirname, '/libs/core/databases/entities/**/*.entity{.ts,.js}')
+      .join(__dirname, '../libs/core/databases/entities/*.entity{.ts,.js}')
       .toString(),
   );
 }

@@ -9,8 +9,8 @@ import {
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
 
-@Entity()
-export class User extends NumberPkEntity {
+@Entity('users')
+export class Users extends NumberPkEntity {
   // prettier-ignore
   @Column({ type: 'varchar', length: 50, unique: true, nullable: false, description: '사용자명' })
   username: string;
@@ -39,14 +39,4 @@ export class User extends NumberPkEntity {
 
   @Column({ type: 'int', nullable: true, description: 'P와 J의 비율' })
   p_j_ratio: number;
-
-  @Index()
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
-
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt!: Date;
-
-  @DeleteDateColumn({ name: 'deleted_at' })
-  deletedAt?: Date;
 }

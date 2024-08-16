@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // DBML 파일 경로
 const dbmlFilePath = path.join(__dirname, '/mkoong.dbml');

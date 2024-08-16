@@ -14,6 +14,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from 'libs/core/filters/http.exception.filter';
 import { CustomValidationPipe } from 'libs/core/pipes/custom.validation.pipe';
 import { ParamsValidationPipe } from 'libs/core/pipes/param.validation.pipe';
+import { PassportModule } from './passport/passport.module';
+import { PostsModule } from './posts/posts.module';
+import { UsersModule } from './users/users.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -50,15 +54,15 @@ import { ParamsValidationPipe } from 'libs/core/pipes/param.validation.pipe';
         database: configService.get<string>('DB_MYSQL_DATABASE'),
         charset: configService.get<string>('DB_MYSQL_CHARSET'),
         timezone: configService.get<string>('DB_MYSQL_TIMEZONE'),
-        logging: true,
-        // entities: [__dirname '/**/*.entity{.ts,.js}'],
-        // entities: [Posts, Channels, Videos, Thumbnails, Users],
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-        // migrations: [path.join(__dirname + '/migrations/*{.ts,.js}')],
-        // migrationsTableName: 'migrations',
-        // synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false),
+        entities: [__dirname + '../libs/core/databases/entities/*.entity{.ts}'],
+        synchronize: true,
+        autoLoadEntities: true,
       }),
     }),
+    PassportModule,
+    PostsModule,
+    UsersModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [

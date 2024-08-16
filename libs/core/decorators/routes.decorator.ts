@@ -1,5 +1,6 @@
 import {
   applyDecorators,
+  CanActivate,
   Delete,
   Get,
   Patch,
@@ -7,7 +8,6 @@ import {
   Put,
   Redirect,
   SetMetadata,
-  UseGuards,
   UseInterceptors,
   Version,
 } from '@nestjs/common';
@@ -33,7 +33,7 @@ const getEnumKeyByValue = (_enum: any, _value: any) => {
   return key || _value;
 };
 
-enum RouteRequestMethodEnum {
+export enum HttpMethodEnum {
   GET = 'GET',
   POST = 'POST',
   PUT = 'PUT',
@@ -48,7 +48,7 @@ export const Tags = ApiTags;
 
 export interface RouteOptions {
   path?: string; // 경로
-  method: RouteRequestMethodEnum | string; // HTTP 메소드
+  method: HttpMethodEnum | string; // HTTP 메소드
   summary?: string; // 요약
   description?: string; // 설명
   tags?: string[]; // 태그 배열
@@ -64,7 +64,7 @@ export interface RouteOptions {
 
 export function Route(options: RouteOptions) {
   const method = getEnumKeyByValue(
-    RouteRequestMethodEnum,
+    HttpMethodEnum,
     options.method,
   ).toUpperCase();
   const decorators = [];
@@ -74,15 +74,15 @@ export function Route(options: RouteOptions) {
   }
 
   // Method (required)
-  if (method === RouteRequestMethodEnum.GET) {
+  if (method === HttpMethodEnum.GET) {
     decorators.push(Get(options.path));
-  } else if (method === RouteRequestMethodEnum.POST) {
+  } else if (method === HttpMethodEnum.POST) {
     decorators.push(Post(options.path));
-  } else if (method === RouteRequestMethodEnum.PUT) {
+  } else if (method === HttpMethodEnum.PUT) {
     decorators.push(Put(options.path));
-  } else if (method === RouteRequestMethodEnum.PATCH) {
+  } else if (method === HttpMethodEnum.PATCH) {
     decorators.push(Patch(options.path));
-  } else if (method === RouteRequestMethodEnum.DELETE) {
+  } else if (method === HttpMethodEnum.DELETE) {
     decorators.push(Delete(options.path));
   } else {
     throw new Error('UNKNOWN METHOD');
@@ -128,10 +128,6 @@ export function Route(options: RouteOptions) {
     );
 
     decorators.push(SetMetadata('roles', options.roles));
-
-    // if (options.roles.includes('user')) {
-    //   decorators.push(UseGuards(JwtAuthGuard));
-    // }
 
     decorators.push(ApiBearerAuth());
   }

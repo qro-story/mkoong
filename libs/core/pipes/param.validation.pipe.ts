@@ -2,7 +2,7 @@ import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 import * as Joi from 'joi';
 import { getTypeSchema } from 'joi-class-decorators';
 import { MyLogger } from '../helpers/logger.helper';
-import { CommonError, ERROR_CODE } from '../types';
+import { CommonError, ERROR } from '../types';
 
 const debug = new MyLogger('app:core:pipes:params:validation:pipe');
 
@@ -46,7 +46,7 @@ export class ParamsValidationPipe implements PipeTransform {
           `실패했어요`;
         // throw new Error(message);
 
-        throw new CommonError(ERROR_CODE.INSUFFICIENT_PARAMS, {
+        throw new CommonError(ERROR.INSUFFICIENT_PARAMS, {
           message: message,
           reasons: reasons,
         });
