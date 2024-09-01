@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { MyLogger } from '../helpers/logger.helper';
 import { onError, onException } from '../types';
+import { Request, Response } from 'express';
 
 const logger = new MyLogger('app:core:http:exception:filter');
 

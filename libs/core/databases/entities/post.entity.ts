@@ -11,10 +11,16 @@ import { NumberPkEntity } from '../abstract.entity';
 
 @Entity('posts')
 export class Posts extends NumberPkEntity {
-  @Column({ type: 'int', nullable: false, description: '사용자 ID' })
-  user_id: number;
+  @Column({
+    name: 'user_id',
+    type: 'int',
+    nullable: false,
+    description: '사용자 ID',
+  })
+  userId: number;
 
   @Column({
+    name: 'title',
     type: 'varchar',
     length: 255,
     nullable: false,
@@ -22,6 +28,11 @@ export class Posts extends NumberPkEntity {
   })
   title: string;
 
-  @Column({ type: 'text', nullable: false, description: '내용' })
+  @Column({
+    name: 'content',
+    type: 'text',
+    nullable: false,
+    description: '내용',
+  })
   content: string;
 }

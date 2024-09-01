@@ -7,14 +7,43 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
+import { PostsService } from 'src/posts/posts.service';
+import { CommonError, ERROR } from '@libs/core/types';
 
 @Injectable()
 export class UsersService extends AbstractRepository<Users> {
   constructor(
-    @InjectRepository(Users) userRepository: Repository<Users>,
     @Inject(REQUEST) req: Request,
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>,
+    private readonly postsService: PostsService,
   ) {
     super(userRepository, req);
+  }
+
+  async getUserById(userId: number) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_USER,
+        message: '해당 id를 갖는 user는 존재하지 않습니다. ',
+      });
+    }
+
+    return user;
+  }
+
+  // passportAuthId 생성
+  async createUserPassportAuth(entity: { passportAuthId: number }) {
+    const user = this.userRepository.create(entity);
+    return await this.userRepository.save(user);
+  }
+
+  async getUserPosts(userId: number) {
+    await this.getUserById(userId);
+    const posts = await this.postsService.getMyPosts(userId);
+
+    return posts;
   }
 
   async updateSettings(id: number, settingsDto: any) {
@@ -22,19 +51,20 @@ export class UsersService extends AbstractRepository<Users> {
     return `Updated settings for user ${id}`;
   }
 
-  async updateNickname(id: number, nickname: string) {
-    // Implement logic to update user nickname
-    return `Updated nickname for user ${id} to ${nickname}`;
+  async updateNickname(userId: number, nickname: string) {
+    await this.getUserById(userId);
+
+    const updateToUser = await this.updateById(userId, { nickname });
+
+    return updateToUser;
   }
 
-  async updateMbti(id: number, mbti: string) {
-    // Implement logic to update user MBTI
-    return `Updated MBTI for user ${id} to ${mbti}`;
-  }
+  async updateMbti(userId: number, mbti: string) {
+    await this.getUserById(userId);
 
-  async getUserPosts(id: number) {
-    // Implement logic to get user posts
-    return `Retrieved posts for user ${id}`;
+    const updateToUser = await this.updateById(userId, { mbti });
+
+    return updateToUser;
   }
 
   async getSelectedPosts(id: number) {

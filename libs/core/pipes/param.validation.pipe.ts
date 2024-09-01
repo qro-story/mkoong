@@ -30,6 +30,8 @@ export class ParamsValidationPipe implements PipeTransform {
       allowUnknown: schema['_preferences'].allowUnknown ?? false,
     });
 
+    console.log('error: ', error);
+
     if (error) {
       if (Joi.isError(error)) {
         const reasons = error.details
@@ -40,12 +42,14 @@ export class ParamsValidationPipe implements PipeTransform {
           )
           .join(', ');
 
+        console.log('reasons : ', reasons);
         const message =
           `'${metadata.type}'에 대한 유효성 검사를 ` +
           (metadata.data ? `항목 "${metadata.data}" 대해서 ` : '') +
           `실패했어요`;
         // throw new Error(message);
 
+        console.log('message : ', message);
         throw new CommonError({
           error: ERROR.INSUFFICIENT_PARAMS,
           message: message,
@@ -55,6 +59,7 @@ export class ParamsValidationPipe implements PipeTransform {
       }
     }
 
+    console.log();
     return value;
   }
 

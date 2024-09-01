@@ -72,18 +72,18 @@ import { CommentsModule } from './comments/comments.module';
       provide: APP_FILTER,
       useValue: new HttpExceptionFilter(),
     },
-    {
-      provide: APP_PIPE,
-      useValue: new CustomValidationPipe({
-        forbidNonWhitelisted: true, // DTO에 정의되지 않은 값이 넘어오면 request 자체 block
-        transform: true, // 클라이언트에서 값을 받자마자 타입을 정의한대로 자동 형변환
-        transformOptions: { enableImplicitConversion: true },
-      }),
-    },
-    {
-      provide: APP_PIPE,
-      useClass: ParamsValidationPipe,
-    },
+    // {
+    //   provide: APP_PIPE,
+    //   useValue: new CustomValidationPipe({
+    //     forbidNonWhitelisted: true, // DTO에 정의되지 않은 값이 넘어오면 request 자체 block
+    //     transform: true, // 클라이언트에서 값을 받자마자 타입을 정의한대로 자동 형변환
+    //     transformOptions: { enableImplicitConversion: true },
+    //   }),
+    // },
+    // {
+    //   provide: APP_PIPE,
+    //   useClass: ParamsValidationPipe,
+    // },
   ],
 })
 export class AppModule implements NestModule {

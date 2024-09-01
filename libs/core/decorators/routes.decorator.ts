@@ -8,6 +8,7 @@ import {
   Put,
   Redirect,
   SetMetadata,
+  UseGuards,
   UseInterceptors,
   Version,
 } from '@nestjs/common';
@@ -24,6 +25,8 @@ import { DeserializeInterceptor } from '../interceptors/deserialize.interceptor'
 import { TimeoutInterceptor } from '../interceptors';
 import { TransactionInterceptor } from '../interceptors/transaction.interceptor';
 import { DataSource } from 'typeorm';
+import { JwtAuthGuard } from 'src/passport/strategies/jwt.strategy';
+import { IAuthGuard, Type } from '@nestjs/passport';
 
 const getEnumKeyByValue = (_enum: any, _value: any) => {
   const indexOfS = Object.values(_enum).indexOf(_value as unknown);
@@ -53,7 +56,7 @@ export interface RouteOptions {
   description?: string; // 설명
   tags?: string[]; // 태그 배열
   roles?: string[]; // 역할 배열
-  version?: string; // 버전
+  guards?: Type<IAuthGuard | CanActivate>[];
   redirect?: boolean; // 리다이렉트 여부
   exclude?: boolean; // 엔드포인트 제외 여부
   auth?: boolean; // 인증 필요 여부
@@ -63,6 +66,8 @@ export interface RouteOptions {
 }
 
 export function Route(options: RouteOptions) {
+  const defaultContentType = 'application/json';
+
   const method = getEnumKeyByValue(
     HttpMethodEnum,
     options.method,
@@ -107,9 +112,54 @@ export function Route(options: RouteOptions) {
     });
   }
 
+  if (options.guards && options.guards.length > 0) {
+    decorators.push(UseGuards(...options.guards));
+  }
+
   // Auth
   if (options.auth === true) {
+    options.guards = options.guards || [];
+
+    options.guards.unshift(JwtAuthGuard);
     decorators.push(ApiBearerAuth());
+
+    decorators.push(UseGuards(...options.guards));
+
+    decorators.push(
+      ApiResponse({
+        status: 401,
+        description: 'Unauthorized',
+        content: {
+          [defaultContentType]: {
+            example: {
+              UnAuthorized: {
+                status: 'ERROR',
+                statusCode: 401,
+                message: 'Unauthorized',
+              },
+            },
+          },
+        },
+      }),
+    );
+
+    decorators.push(
+      ApiResponse({
+        status: 403,
+        description: 'Access Not Allow',
+        content: {
+          [defaultContentType]: {
+            example: {
+              AccessNotAllow: {
+                status: 'ERROR',
+                message: 'Access Not Allow',
+                statusCode: 403,
+              },
+            },
+          },
+        },
+      }),
+    );
   }
 
   // Roles
@@ -134,14 +184,6 @@ export function Route(options: RouteOptions) {
 
   decorators.push(ApiConsumes('application/x-www-form-urlencoded'));
   decorators.push(ApiConsumes('application/json'));
-
-  // Version
-  if (options.version) {
-    decorators.push(Version(options.version));
-  } else if (options.version !== '') {
-    // default 1
-    decorators.push(Version('1'));
-  }
 
   // Redirect
   if (options.redirect) {

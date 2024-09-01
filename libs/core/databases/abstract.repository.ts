@@ -65,18 +65,21 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     );
   }
 
-  async create(entity: DeepPartial<TEntity> & TEntity): Promise<TEntity> {
+  async create(entity: DeepPartial<TEntity>): Promise<TEntity> {
     const repository = this.getRepository();
 
-    const id: TEntity = await repository.findOne({
-      where: {
-        id: entity.id,
-      },
-    });
-    if (id) {
-      throw new ConflictException(ERROR.ALREADY_USED_DATA);
-    }
-    return await repository.save(entity);
+    // const id: TEntity = await repository.findOne({
+    //   where: {
+    //     id: entity.id,
+    //   },
+    // });
+    // if (id) {
+    //   throw new ConflictException(ERROR.ALREADY_USED_DATA);
+    // }
+
+    const item = repository.create(entity);
+
+    return await repository.save(item);
   }
 
   // async createMany(
@@ -178,12 +181,13 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     return entity;
   }
 
+  // pk를 바탕으로 업데이트 하기
   async updateById(
     id: number,
     entity: QueryDeepPartialEntity<TEntity>,
   ): Promise<TEntity> {
     const where: any = { id: id };
-    await this.getById(id);
+
     await this.getRepository().update(id, entity);
     return await this.getRepository().findOne({ where });
   }

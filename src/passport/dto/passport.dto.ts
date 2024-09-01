@@ -1,30 +1,48 @@
 import { Property, Schema } from '@libs/core/decorators';
+import { PickType } from '@nestjs/swagger';
 
-@Schema()
+@Schema({ allowUnknown: false })
 export class PassportAuth {
-  @Property({ type: 'number', required: false })
+  @Property({ type: 'number' })
   id?: number;
 
-  @Property({ type: 'number', required: false })
+  @Property({ type: 'number' })
   user_id: number;
 
-  @Property({ type: 'string', required: false })
+  @Property({ type: 'string' })
   provider: string;
 
-  @Property({ type: 'string', required: false })
+  @Property({ type: 'string' })
   email: string;
 
-  @Property({ type: 'string', required: false })
+  @Property({ type: 'string' })
   password: string;
 
-  @Property({ type: 'string', required: false })
-  provider_user_id: string;
+  @Property({ type: 'string' })
+  providerUserId: string;
 
-  @Property({ type: 'string', required: false })
-  access_token: string;
+  @Property({ type: 'string' })
+  accessToken: string;
 
-  @Property({ type: 'string', required: false })
-  refresh_token: string;
+  @Property({ type: 'string' })
+  refreshToken: string;
 }
 
-export class CreatePassportDto extends PassportAuth {}
+//todo 일단은 간단한 회원가입만
+@Schema({ allowUnknown: false })
+export class CreatePassportDto extends PickType(PassportAuth, [
+  'email',
+  'password',
+]) {}
+
+// @Schema({ allowUnknown: false })
+// export class CreatePassportDto {
+//   @Property({ type: 'string' })
+//   email: string;
+
+//   @Property({ type: 'string' })
+//   password: string;
+// }
+@Schema()
+export class SignInDto extends PickType(PassportAuth, ['email', 'password']) {}
+export class RefreshTokenDto extends PickType(PassportAuth, ['refreshToken']) {}

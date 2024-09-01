@@ -8,35 +8,55 @@ import {
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
+import { MBTI } from 'src/users/types/mbti.type';
 
 @Entity('users')
 export class Users extends NumberPkEntity {
   // prettier-ignore
-  @Column({ type: 'varchar', length: 50, unique: true, nullable: false, description: '사용자명' })
+  @Column({name : 'passport_auth_id', type: 'int', nullable: false, description: '사용자명'})
+  passportAuthId: number;
+
+  // prettier-ignore
+  @Column({ type: 'varchar', length: 50, nullable: true, description: '사용자명' })
   username: string;
 
   // prettier-ignore
-  @Column({ type: 'varchar', length: 20, unique: true, description: '핸드폰 번호', })
-  phone_number: string;
+  @Column({ name: 'phone_number', type: 'varchar', length: 20, description: '핸드폰 번호',  nullable: true})
+  phoneNumber: string;
 
-  @Column({ type: 'date', description: '생년월일' })
+  @Column({ type: 'date', description: '생년월일', nullable: true })
   birth: Date;
 
-  @Column({ type: 'varchar', length: 2, description: '성별' })
+  // prettier-ignore
+  @Column({ type: 'varchar', length: 2, description: '성별' , nullable: true})
   gender: string;
 
-  @Column({ type: 'varchar', length: 50, description: 'profile의 닉네임' })
+  // prettier-ignore
+  @Column({ type: 'varchar', length: 50, description: 'profile의 닉네임' , nullable: true})
   nickname: string;
 
-  @Column({ type: 'int', nullable: true, description: 'E와 I의 비율' })
-  e_i_ratio: number;
+  // prettier-ignore
+  @Column({ type: 'varchar',enum: MBTI, length: 50, description: 'profile의 닉네임' , nullable: true})
+  mbti: string;
 
-  @Column({ type: 'int', nullable: true, description: 'N과 S의 비율' })
-  n_s_ratio: number;
+  // prettier-ignore
+  @Column({
+    name: 'e_i_ratio',
+    type: 'int',
+    nullable: true,
+    description: 'E와 I의 비율',
+  })
+  eiRatio?: number;
 
-  @Column({ type: 'int', nullable: true, description: 'F와 T의 비율' })
-  f_t_ratio: number;
+  // prettier-ignore
+  @Column({ name: 'n_s_ratio', type: 'int', nullable: true, description: 'N과 S의 비율' })
+  nsRatio?: number;
 
-  @Column({ type: 'int', nullable: true, description: 'P와 J의 비율' })
-  p_j_ratio: number;
+  // prettier-ignore
+  @Column({ name: 'f_t_ratio', type: 'int', nullable: true, description: 'F와 T의 비율' })
+  ftRatio?: number;
+
+  // prettier-ignore
+  @Column({ name: 'p_j_ratio', type: 'int', nullable: true, description: 'P와 J의 비율' })
+  pjRatio?: number;
 }
