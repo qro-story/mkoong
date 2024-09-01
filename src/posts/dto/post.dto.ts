@@ -1,4 +1,5 @@
 import { Property } from '@libs/core/decorators';
+import { PartialType } from '@nestjs/swagger';
 
 export class CreatePostDTO {
   @Property({
@@ -13,3 +14,5 @@ export class CreatePostDTO {
   })
   content: string;
 }
+
+export class UpdatePostDTO extends PartialType(CreatePostDTO) {}

@@ -10,6 +10,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as path from 'path';
 import { ParamsValidationPipe } from '@libs/core/pipes/param.validation.pipe';
 import { CustomValidationPipe } from '@libs/core/pipes/custom.validation.pipe';
+import { ResponseInterceptor } from '@libs/core/interceptors/response.interceptor';
 
 const logger = new MyLogger('app:mkoong');
 async function bootstrap() {
@@ -38,6 +39,8 @@ async function bootstrap() {
 
   app.use(json({ limit: '10mb' }));
   app.use(urlencoded({ extended: true, limit: '10mb' }));
+
+  app.useGlobalInterceptors(new ResponseInterceptor());
 
   // app.useGlobalPipes(new ParamsValidationPipe());
   app.useGlobalPipes(

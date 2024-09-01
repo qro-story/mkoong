@@ -112,10 +112,6 @@ export function Route(options: RouteOptions) {
     });
   }
 
-  if (options.guards && options.guards.length > 0) {
-    decorators.push(UseGuards(...options.guards));
-  }
-
   // Auth
   if (options.auth === true) {
     options.guards = options.guards || [];
@@ -160,6 +156,10 @@ export function Route(options: RouteOptions) {
         },
       }),
     );
+  }
+
+  if (options.guards && options.guards.length > 0) {
+    decorators.push(UseGuards(...options.guards));
   }
 
   // Roles
@@ -212,6 +212,14 @@ export function Route(options: RouteOptions) {
   if (options.transform) {
     decorators.push(
       UseInterceptors(new DeserializeInterceptor(options.transform)),
+    );
+    // Add Swagger response schema for successful operations
+    decorators.push(
+      ApiResponse({
+        status: ['POST', 'PUT'].includes(method) ? 201 : 200,
+        description: 'Success',
+        type: options.transform,
+      }),
     );
   }
 

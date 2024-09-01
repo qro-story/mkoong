@@ -18,6 +18,8 @@ import { Route } from '@libs/core/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { UserInfo } from '@libs/core/decorators/info.decorator';
 import { TokenPayload } from 'src/passport/interfaces/passport.interface';
+import { CreatePostDTO } from 'src/posts/dto/post.dto';
+import { PostRO } from 'src/posts/dto/post.ro';
 
 @ApiTags('users')
 @Controller('users')
@@ -66,6 +68,7 @@ export class UsersController {
     method: 'get',
     auth: true,
     summary: '내가 작성한 글 가져오기',
+    transform: PostRO,
   })
   getUserPosts(@UserInfo() user: TokenPayload) {
     const { id } = user;

@@ -24,7 +24,7 @@ export function customResponseForSuccess(data: any): ResponseInterface {
   return customResponse({
     status: 'SUCCESS',
     statusCode: HttpStatus.OK,
-    message: 'Operation successful',
+    message: 'API가 성공적으로 호출되었습니다.',
     data,
   });
 }

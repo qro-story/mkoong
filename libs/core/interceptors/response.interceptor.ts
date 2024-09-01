@@ -25,6 +25,7 @@ export class ResponseInterceptor implements NestInterceptor {
         if (req.customResponse === true) {
           return data;
         }
+
         return customResponseForSuccess(data);
       }),
     );

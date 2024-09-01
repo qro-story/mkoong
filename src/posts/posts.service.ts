@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CreatePostDTO } from './dto/create-post.dto';
+import { CreatePostDTO } from './dto/post.dto';
 import { TokenPayload } from 'src/passport/interfaces/passport.interface';
 import { Repository } from 'typeorm';
 import { Posts } from '@libs/core/databases/entities/post.entity';
