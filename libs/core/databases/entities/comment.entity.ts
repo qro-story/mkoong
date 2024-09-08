@@ -11,17 +11,37 @@ import { NumberPkEntity } from '../abstract.entity';
 
 @Entity('comments')
 export class Comments extends NumberPkEntity {
-  @Column({ type: 'int', nullable: false, description: '게시물 ID' })
-  post_id: number;
+  @Column({
+    name: 'post_id',
+    type: 'int',
+    nullable: false,
+    description: '게시물 ID',
+  })
+  postId: number;
 
-  @Column({ type: 'int', nullable: true, description: '상위 댓글 ID' })
-  parent_id?: number;
+  @Column({
+    name: 'parent_id',
+    type: 'int',
+    nullable: true,
+    description: '상위 댓글 ID',
+  })
+  parentId?: number;
 
-  @Column({ type: 'int', default: 0, description: '댓글을 그룹핑하기 위한 id' })
-  comment_group_id: number;
+  @Column({
+    name: 'comment_group_id',
+    type: 'int',
+    default: 1,
+    description: '댓글을 그룹핑하기 위한 id',
+  })
+  groupId: number;
 
-  @Column({ type: 'int', nullable: false, description: '사용자 ID' })
-  user_id: number;
+  @Column({
+    name: 'user_id',
+    type: 'int',
+    nullable: false,
+    description: '사용자 ID',
+  })
+  userId: number;
 
   @Column({ type: 'text', nullable: false, description: '댓글 내용' })
   content: string;
