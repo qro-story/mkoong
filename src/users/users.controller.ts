@@ -1,24 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import {
-  UpdateMbtiDto,
-  UpdateNicknameDto,
-  UpdateUserDto,
-} from './dto/update-user.dto';
+import { UpdateMbtiDto, UpdateNicknameDto } from './dto/update-user.dto';
 import { Route } from '@libs/core/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { UserInfo } from '@libs/core/decorators/info.decorator';
 import { TokenPayload } from 'src/passport/interfaces/passport.interface';
-import { CreatePostDTO } from 'src/posts/dto/post.dto';
 import { PostRO } from 'src/posts/dto/post.ro';
 
 @ApiTags('users')

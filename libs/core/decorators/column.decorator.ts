@@ -13,6 +13,7 @@ import {
   Index,
   Column as OriginalColumn,
 } from 'typeorm';
+import { CommonError, ERROR } from '../types';
 
 type ColumnType = OriginalColumnType | 'password' | 'timezone' | 'any';
 
@@ -76,6 +77,12 @@ export function Column(options: ColumnOptions) {
   switch (options.type) {
     case 'char':
     case 'varchar':
+      if (!options.length) {
+        throw new CommonError({
+          error: ERROR.INSUFFICIENT_PARAMS,
+          message: 'varchar타입은 반드시 length가 주어져야 합니다. ',
+        });
+      }
       column.length = options.length;
       decorators.push(OriginalColumn(column));
       decorators.push(IsString);

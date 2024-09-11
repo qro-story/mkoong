@@ -4,8 +4,10 @@ import { ApiTags } from '@nestjs/swagger';
 import { HttpMethodEnum, Route } from '@libs/core/decorators';
 import {
   CreatePassportDto,
+  PassportPhoneAuthDTO,
   RefreshTokenDto,
   SignInDto,
+  VerifyPhoneAuthRandomNumberDTO,
 } from './dto/passport.dto';
 import { RefreshTokenGuard } from './strategies/refresh.jwt.strategy';
 
@@ -13,6 +15,33 @@ import { RefreshTokenGuard } from './strategies/refresh.jwt.strategy';
 @Controller('passport')
 export class PassportController {
   constructor(private readonly passportService: PassportService) {}
+
+  @Route({
+    path: '/request/phone/auth',
+    method: 'POST',
+    summary: '전화번호 인증 요청하기',
+    description: '인증 번호를 생성하고 저장합니다.',
+  })
+  async requestPhoneAuth(@Body() dto: PassportPhoneAuthDTO) {
+    const { phoneNumber } = dto;
+    await this.passportService.sendRandomNumber(phoneNumber);
+    return '인증 번호가 발송되었습니다.';
+  }
+
+  @Route({
+    path: '/verify/phone/auth',
+    method: 'POST',
+    summary: '전화번호 인증 검증하기',
+    description: '인증 번호를 검증하고 성공 시 verifiedAt을 업데이트합니다.',
+  })
+  async verifyPhoneAuth(@Body() dto: VerifyPhoneAuthRandomNumberDTO) {
+    const { phoneNumber, verificationCode } = dto;
+    await this.passportService.verifyRandomNumber(
+      phoneNumber,
+      verificationCode,
+    );
+    return '전화번호 인증이 완료되었습니다.';
+  }
 
   @Route({
     path: '/sign-up',

@@ -2,7 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { PassportService } from './passport.service';
 import { PassportController } from './passport.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PassportAuth } from '@libs/core/databases/entities/passportauth.entity';
+import { PassportAuth } from '@libs/core/databases/entities/passport.auth.entity';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';

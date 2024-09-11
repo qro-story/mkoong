@@ -1,5 +1,6 @@
 import { Property, Schema } from '@libs/core/decorators';
 import { PickType } from '@nestjs/swagger';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 @Schema({ allowUnknown: false })
 export class PassportAuth {
@@ -26,6 +27,24 @@ export class PassportAuth {
 
   @Property({ type: 'string' })
   refreshToken: string;
+}
+
+export class PassportPhoneAuthDTO {
+  @Property({
+    type: 'string',
+    description: '인증에 필요한 핸드폰 번호 => 이후에 정규식으로 변환 예정',
+  })
+  phoneNumber: string;
+}
+
+export class VerifyPhoneAuthRandomNumberDTO {
+  @IsString()
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
+  verificationCode: string;
 }
 
 //todo 일단은 간단한 회원가입만

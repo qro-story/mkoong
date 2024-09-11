@@ -1,13 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, BadRequestException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { AbstractRepository } from '@libs/core/databases';
-import { PassportAuth } from '@libs/core/databases/entities/passportauth.entity';
+import { PassportAuth } from '@libs/core/databases/entities/passport.auth.entity';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { CreatePassportDto, SignInDto } from './dto/passport.dto';
-import { CommonError, ERROR } from '@libs/core/types';
+import { CommonError, ERROR, ERROR_CODE } from '@libs/core/types';
 import * as bcrypt from 'bcrypt'; // bcrypt 라이브러리 추가
 import { TokenPayload } from './interfaces/passport.interface';
 import { JwtService } from '@nestjs/jwt';
@@ -35,6 +35,14 @@ export class PassportService extends AbstractRepository<PassportAuth> {
     private readonly configService: ConfigService,
   ) {
     super(passportAuthRepository, req);
+  }
+  async getPassportAuthByPhone(phoneNumber: string) {
+    const passportAuth = await this.passportAuthRepository.findOne({
+      where: {
+        phoneNumber,
+      },
+    });
+    return passportAuth;
   }
 
   /* 해당 유저가 정상적인 유저입지 검사 */
@@ -118,5 +126,67 @@ export class PassportService extends AbstractRepository<PassportAuth> {
       accessToken,
       refreshToken,
     };
+  }
+
+  async sendRandomNumber(phoneNumber: string): Promise<void> {
+    const verificationCode = this.generateRandomNumber();
+    const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10분 후 만료
+
+    // 랜덤 번호 암호화
+    const hashedVerificationCode = await bcrypt.hash(verificationCode, 10);
+
+    await this.passportAuthRepository.update(
+      { phoneNumber },
+      { verificationCode: hashedVerificationCode, verificationExpires },
+    );
+
+    // TODO: 실제 SMS 발송 로직 구현
+    console.log(`Verification code ${verificationCode} sent to ${phoneNumber}`);
+  }
+
+  async verifyRandomNumber(phoneNumber: string, code: string): Promise<void> {
+    const passportAuth = await this.passportAuthRepository.findOne({
+      where: { phoneNumber },
+    });
+
+    if (!passportAuth) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
+        message: '해당 전화번호로 등록된 사용자가 없습니다.',
+      });
+    }
+
+    if (passportAuth.verificationExpires < new Date()) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
+        message: '이미 만료된 인증 코드입니다.',
+      });
+    }
+
+    // 암호화된 코드와 입력된 코드 비교
+    const isValidCode = await bcrypt.compare(
+      code,
+      passportAuth.verificationCode,
+    );
+    if (!isValidCode) {
+      throw new CommonError({
+        error: ERROR.INVALID_REQUEST,
+        message: '잘못된 인증 코드입니다.',
+      });
+    }
+
+    // 인증 성공 시 verifiedAt 업데이트
+    await this.passportAuthRepository.update(
+      { id: passportAuth.id },
+      {
+        verifiedAt: new Date(),
+        verificationCode: null,
+        verificationExpires: null,
+      },
+    );
+  }
+
+  private generateRandomNumber(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
   }
 }
