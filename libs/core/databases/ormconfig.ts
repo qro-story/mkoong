@@ -2,7 +2,6 @@ import { DataSource } from 'typeorm';
 import 'dotenv/config';
 import * as path from 'path';
 import { config } from 'dotenv';
-import { Posts } from './entities/post.entity';
 
 config({
   path: '../../../.env',

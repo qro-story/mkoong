@@ -1,15 +1,6 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AuthGuard, PassportStrategy } from '@nestjs/passport';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
-import { Strategy, ExtractJwt } from 'passport-jwt';
 import { PassportService } from '../passport.service';
-import { Observable } from 'rxjs';
 import { CommonError, ERROR } from '@libs/core/types';
 
 // TODO:   refresh token 검증 후 새로운 access token 발급

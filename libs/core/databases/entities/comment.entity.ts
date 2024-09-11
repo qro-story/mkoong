@@ -1,10 +1,4 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  Index,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, OneToMany, ManyToOne } from 'typeorm';
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
@@ -28,14 +22,6 @@ export class Comments extends NumberPkEntity {
   parentId?: number;
 
   @Column({
-    name: 'comment_group_id',
-    type: 'int',
-    default: 1,
-    description: '댓글을 그룹핑하기 위한 id',
-  })
-  groupId: number;
-
-  @Column({
     name: 'user_id',
     type: 'int',
     nullable: false,
@@ -45,4 +31,10 @@ export class Comments extends NumberPkEntity {
 
   @Column({ type: 'text', nullable: false, description: '댓글 내용' })
   content: string;
+
+  @ManyToOne(() => Comments, (comment) => comment.replies)
+  parent: Comments;
+
+  @OneToMany(() => Comments, (comment) => comment.parent)
+  replies: Comments[];
 }

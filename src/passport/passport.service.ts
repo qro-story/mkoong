@@ -46,7 +46,7 @@ export class PassportService extends AbstractRepository<PassportAuth> {
     });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user;
+      const { ...result } = user;
       return result;
     }
     return null;

@@ -1,22 +1,25 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { CreateCommentDTO } from './dto/comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CommentRO } from './dto/comment.dto';
+import { Route } from '@libs/core/decorators';
+import { ApiTags } from '@nestjs/swagger';
+import { CommentListRO } from './dto/comment.ro';
 
+@ApiTags('Comments')
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDTO) {
-    return this.commentsService.create(createCommentDto);
+  @Route({
+    path: '/post/:postId',
+    method: 'GET',
+    summary: '특정 게시글에 달린 댓글과 대댓글 가져오기',
+    transform: CommentListRO,
+  })
+  async getCommentsByPostId(
+    @Param('postId') postId: number,
+  ): Promise<CommentListRO> {
+    const comments = await this.commentsService.getCommentsByPostId(postId);
+    return { comments };
   }
 }

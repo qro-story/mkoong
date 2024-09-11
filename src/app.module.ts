@@ -1,19 +1,12 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  ValidationPipe,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import helmet from 'helmet';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from 'libs/core/filters/http.exception.filter';
-import { CustomValidationPipe } from 'libs/core/pipes/custom.validation.pipe';
-import { ParamsValidationPipe } from 'libs/core/pipes/param.validation.pipe';
 import { PassportModule } from './passport/passport.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
@@ -72,18 +65,6 @@ import { CommentsModule } from './comments/comments.module';
       provide: APP_FILTER,
       useValue: new HttpExceptionFilter(),
     },
-    // {
-    //   provide: APP_PIPE,
-    //   useValue: new CustomValidationPipe({
-    //     forbidNonWhitelisted: true, // DTO에 정의되지 않은 값이 넘어오면 request 자체 block
-    //     transform: true, // 클라이언트에서 값을 받자마자 타입을 정의한대로 자동 형변환
-    //     transformOptions: { enableImplicitConversion: true },
-    //   }),
-    // },
-    // {
-    //   provide: APP_PIPE,
-    //   useClass: ParamsValidationPipe,
-    // },
   ],
 })
 export class AppModule implements NestModule {
