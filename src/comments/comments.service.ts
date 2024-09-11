@@ -66,18 +66,33 @@ export class CommentsService {
   async getCommentsByPostId(postId: number): Promise<CommentRO[]> {
     const comments = await this.commentsRepository.find({
       where: { postId },
-      relations: {
-        replies: true,
-        likes: true,
-      },
+      relations: ['replies', 'likes'],
       order: { createdAt: 'DESC' },
     });
-    comments.map((comment) => {
-      comment['likesCount'] = comment.likes.length;
-    });
-    console.log('comments : ', comments);
 
-    return comments;
+    const filterComments = comments.filter(
+      (comment) => comment.parentId === null,
+    );
+
+    const processComments = (comments: Comments[]): CommentRO[] => {
+      return comments.map((comment) => {
+        const likesCount = comment.likes?.filter((like) => like.isLike).length;
+
+        let replies: CommentRO[] = [];
+        if (comment.replies && comment.replies.length > 0) {
+          replies = processComments(comment.replies);
+        }
+
+        return {
+          ...comment,
+          likesCount: likesCount ?? 0,
+          replies,
+        };
+      });
+    };
+
+    console.log('filterComments : ', processComments(filterComments));
+    return processComments(filterComments);
   }
 
   async likeComment(commentId: number, userId: number): Promise<void> {

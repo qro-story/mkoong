@@ -106,6 +106,9 @@ export function Property(options: PropertyOptions) {
 
   if (options.required !== true) {
     decorators.push(ApiProperty({ nullable: true }));
+  } else {
+    decorators.push(IsNotEmpty);
+    joiSchemaChain = joiSchema.required();
   }
 
   switch (type) {
@@ -228,21 +231,10 @@ export function Property(options: PropertyOptions) {
   if (options.exclude === true) {
     decorators.push(Exclude());
   } else {
-    if (options.required !== false) {
-      decorators.push(IsNotEmpty);
-      joiSchemaChain = joiSchema.required();
-    } else {
-      decorators.push(IsOptional);
-      joiSchemaChain = joiSchema.optional();
-
-      property.nullable = true;
-      joiSchemaChain = joiSchema.allow(null, '');
-    }
-
-    decorators.push(ApiProperty(property));
     decorators.push(Expose());
   }
 
+  decorators.push(ApiProperty(property));
   decorators.push(JoiSchema(joiSchemaChain));
 
   return applyDecorators(...decorators);

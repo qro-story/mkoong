@@ -13,7 +13,6 @@ import {
   Index,
   Column as OriginalColumn,
 } from 'typeorm';
-import { CustomColumn } from './custom.column';
 
 type ColumnType = OriginalColumnType | 'password' | 'timezone' | 'any';
 
@@ -86,7 +85,7 @@ export function Column(options: ColumnOptions) {
     case 'text':
     case 'longtext':
       column.json = options.json;
-      decorators.push(CustomColumn(column));
+      decorators.push(OriginalColumn(column));
       decorators.push(IsString);
 
       if (column.json) {
@@ -98,7 +97,7 @@ export function Column(options: ColumnOptions) {
 
     case 'datetime':
       column.onUpdate = options.onUpdate;
-      decorators.push(CustomColumn(column));
+      decorators.push(OriginalColumn(column));
       decorators.push(IsString);
       decorators.push(Type(() => Date));
       break;
@@ -145,7 +144,7 @@ export function Column(options: ColumnOptions) {
       break;
 
     case 'boolean':
-      decorators.push(CustomColumn(column));
+      decorators.push(OriginalColumn(column));
       decorators.push(IsBoolean);
       decorators.push(Type(() => Boolean));
       break;
@@ -172,7 +171,7 @@ export function Column(options: ColumnOptions) {
       break;
 
     case 'uuid':
-      decorators.push(CustomColumn(column));
+      decorators.push(OriginalColumn(column));
       break;
   }
 

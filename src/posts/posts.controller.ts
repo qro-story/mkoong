@@ -49,6 +49,19 @@ export class PostsController {
   }
 
   @Route({
+    path: '/:postId/comments',
+    method: 'GET',
+    summary: '특정 게시글에 달린 댓글과 대댓글 가져오기',
+    transform: CommentListRO,
+  })
+  async getCommentsByPostId(
+    @Param('postId') postId: number,
+  ): Promise<CommentListRO> {
+    const comments = await this.commentsService.getCommentsByPostId(postId);
+    return { comments };
+  }
+
+  @Route({
     path: '/',
     method: 'POST',
     auth: true,
