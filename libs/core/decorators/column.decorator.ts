@@ -21,6 +21,7 @@ enum Timezone {
   ASIA_SEOUL = 'Asia/Seoul',
   UTC = 'UTC',
 }
+
 export interface ColumnOptions {
   type: ColumnType; // 컬럼 타입
   default?: any; // 기본값
@@ -38,8 +39,6 @@ export interface ColumnOptions {
   unique?: boolean; // 유니크 여부
   index?: boolean; // 인덱스 여부
   unsigned?: boolean; // 부호 없는 정수 타입 여부
-  zerofill?: boolean; // 0으로 채우기 여부
-  properties?: any; // 실제로는 사용 안함
   example?: any; // 예시
   regex?: string;
 }
@@ -128,7 +127,6 @@ export function Column(options: ColumnOptions) {
       column.precision = options.precision;
       column.scale = options.scale;
       column.unsigned = options.unsigned;
-      column.zerofill = options.zerofill;
       decorators.push(OriginalColumn(column));
       decorators.push(IsNumber);
       decorators.push(Type(() => Number));
@@ -141,7 +139,6 @@ export function Column(options: ColumnOptions) {
     case 'bigint':
       column.width = options.length;
       column.unsigned = options.unsigned;
-      column.zerofill = options.zerofill;
       decorators.push(OriginalColumn(column));
       decorators.push(IsNumber);
       decorators.push(Type(() => Number));

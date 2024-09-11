@@ -24,7 +24,6 @@ export class PostsController {
     guards: [PostOwnerGuard],
     auth: true,
     summary: '게시글에 댓글 달기 ',
-    transform: CommentListRO,
   })
   async commentByPostId(
     @UserInfo() user: TokenPayload,
@@ -32,8 +31,6 @@ export class PostsController {
     @Body() dto: CreateCommentDTO,
   ) {
     const { id: userId } = user;
-    console.log('user : ', user);
-    console.log('postId : ', postId);
     return this.commentsService.createComment(postId, userId, dto);
   }
 

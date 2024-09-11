@@ -40,6 +40,12 @@ export class CommentRO extends CreateCommentDTO {
   userId: number;
 
   @Property({
+    type: 'number',
+    description: '좋아요 개수',
+  })
+  likesCount?: number;
+
+  @Property({
     type: 'date',
     required: true,
     description: '작성 일시',

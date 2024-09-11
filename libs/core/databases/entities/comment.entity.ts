@@ -2,6 +2,7 @@ import { Entity, OneToMany, ManyToOne } from 'typeorm';
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
+import { CommentLike } from './comment.like.entity';
 
 @Entity('comments')
 export class Comments extends NumberPkEntity {
@@ -37,4 +38,7 @@ export class Comments extends NumberPkEntity {
 
   @OneToMany(() => Comments, (comment) => comment.parent)
   replies: Comments[];
+
+  @OneToMany(() => CommentLike, (like) => like.comment)
+  likes: CommentLike[];
 }

@@ -1,9 +1,12 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { CommentsService } from './comments.service';
-import { CommentRO } from './dto/comment.dto';
 import { Route } from '@libs/core/decorators';
 import { ApiTags } from '@nestjs/swagger';
 import { CommentListRO } from './dto/comment.ro';
+import { UserInfo } from '@libs/core/decorators/info.decorator';
+import { TokenPayload } from 'src/passport/interfaces/passport.interface';
+import { Post, Delete, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/passport/strategies/jwt.strategy';
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -21,5 +24,24 @@ export class CommentsController {
   ): Promise<CommentListRO> {
     const comments = await this.commentsService.getCommentsByPostId(postId);
     return { comments };
+  }
+
+  @Route({
+    path: '/:commentId/like',
+    method: 'POST',
+    auth: true,
+    summary: '댓글 좋아요',
+  })
+  async likeComment(
+    @UserInfo() user: TokenPayload,
+    @Param('commentId') commentId: number,
+  ) {
+    const { id: userId } = user;
+    return this.commentsService.likeComment(commentId, userId);
+  }
+
+  @Get(':id/likes')
+  async getLikesCount(@Param('id') id: number) {
+    return this.commentsService.getLikesCount(id);
   }
 }

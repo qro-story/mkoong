@@ -2,14 +2,31 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comments } from '@libs/core/databases/entities/comment.entity';
+import { CommentLike } from '../../libs/core/databases/entities/comment.like.entity';
 import { CreateCommentDTO, CommentRO } from './dto/comment.dto';
+import { CommonError, ERROR } from '@libs/core/types';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comments)
     private commentsRepository: Repository<Comments>,
+    @InjectRepository(CommentLike)
+    private commentLikeRepository: Repository<CommentLike>,
   ) {}
+
+  async getCommentById(commentId: number): Promise<Comments> {
+    const comment = await this.commentsRepository.findOne({
+      where: { id: commentId },
+    });
+    if (!comment) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
+        message: '해당 댓글을 찾을 수 없습니다.',
+      });
+    }
+    return comment;
+  }
 
   async createComment(
     postId: number,
@@ -18,19 +35,32 @@ export class CommentsService {
   ): Promise<CommentRO> {
     const { parentId, content } = createCommentDto;
 
+    let parent: Comments;
+
+    if (parentId) {
+      parent = await this.commentsRepository.findOne({
+        where: { id: parentId },
+      });
+      if (!parent) {
+        throw new CommonError({
+          error: ERROR.NO_EXISTS_DATA,
+          message: '존재하지 않는 부모 댓글입니다.',
+        });
+      }
+    }
+    console.log('parent : ', parentId ?? null);
+
     const comment = this.commentsRepository.create({
       postId,
       userId,
       content,
-      parentId,
-      parent: parentId
-        ? await this.commentsRepository.findOne({ where: { id: parentId } })
-        : null,
+      parentId: parentId ?? null,
+      parent,
     });
 
     await this.commentsRepository.save(comment);
 
-    return this.mapCommentToDTO(comment);
+    return comment;
   }
 
   async getCommentsByPostId(postId: number): Promise<CommentRO[]> {
@@ -38,22 +68,80 @@ export class CommentsService {
       where: { postId },
       relations: {
         replies: true,
+        likes: true,
       },
       order: { createdAt: 'DESC' },
     });
+    comments.map((comment) => {
+      comment['likesCount'] = comment.likes.length;
+    });
+    console.log('comments : ', comments);
 
-    return comments.map((comment) => this.mapCommentToDTO(comment));
+    return comments;
   }
 
-  private mapCommentToDTO(comment: Comments): CommentRO {
-    return {
-      id: comment.id,
-      postId: comment.postId,
-      parentId: comment.parentId,
-      content: comment.content,
-      userId: comment.userId,
-      createdAt: comment.createdAt,
-      replies: comment.replies?.map((reply) => this.mapCommentToDTO(reply)),
-    };
+  async likeComment(commentId: number, userId: number): Promise<void> {
+    const comment = await this.getCommentById(commentId);
+
+    const like = await this.commentLikeRepository.findOne({
+      where: { userId, comment: { id: commentId } },
+    });
+
+    const commentLike = this.commentLikeRepository.create({
+      userId,
+      isLike: !like?.isLike,
+      comment,
+    });
+
+    await this.commentLikeRepository.save(commentLike);
+  }
+
+  async addLikeOrDislike(
+    commentId: number,
+    userId: number,
+    isLike: boolean,
+  ): Promise<void> {
+    const comment = await this.commentsRepository.findOne({
+      where: { id: commentId },
+    });
+    if (!comment) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
+        message: '해당 댓글을 찾을 수 없습니다.',
+      });
+    }
+
+    let like = await this.commentLikeRepository.findOne({
+      where: { comment: { id: commentId }, userId },
+    });
+    if (like) {
+      like.isLike = isLike;
+    } else {
+      like = this.commentLikeRepository.create({ comment, userId, isLike });
+    }
+    await this.commentLikeRepository.save(like);
+  }
+
+  async removeLikeOrDislike(commentId: number, userId: number): Promise<void> {
+    const like = await this.commentLikeRepository.findOne({
+      where: { comment: { id: commentId }, userId },
+    });
+    if (like) {
+      await this.commentLikeRepository.remove(like);
+    }
+  }
+
+  async getLikesCount(
+    commentId: number,
+  ): Promise<{ likes: number; dislikes: number }> {
+    const [likes, dislikes] = await Promise.all([
+      this.commentLikeRepository.count({
+        where: { comment: { id: commentId }, isLike: true },
+      }),
+      this.commentLikeRepository.count({
+        where: { comment: { id: commentId }, isLike: false },
+      }),
+    ]);
+    return { likes, dislikes };
   }
 }
