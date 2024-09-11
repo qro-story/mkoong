@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Comments } from '@libs/core/databases/entities/comment.entity';
 import { CommentLike } from '../../libs/core/databases/entities/comment.like.entity';
 import { CreateCommentDTO, CommentRO } from './dto/comment.dto';
 import { CommonError, ERROR } from '@libs/core/types';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class CommentsService {
@@ -13,6 +14,8 @@ export class CommentsService {
     private commentsRepository: Repository<Comments>,
     @InjectRepository(CommentLike)
     private commentLikeRepository: Repository<CommentLike>,
+    @Inject(forwardRef(() => UsersService))
+    private readonly userService: UsersService,
   ) {}
 
   async getCommentById(commentId: number): Promise<Comments> {
@@ -37,6 +40,8 @@ export class CommentsService {
 
     let parent: Comments;
 
+    const user = await this.userService.getUserById(userId);
+
     if (parentId) {
       parent = await this.commentsRepository.findOne({
         where: { id: parentId },
@@ -48,7 +53,6 @@ export class CommentsService {
         });
       }
     }
-    console.log('parent : ', parentId ?? null);
 
     const comment = this.commentsRepository.create({
       postId,
@@ -56,6 +60,7 @@ export class CommentsService {
       content,
       parentId: parentId ?? null,
       parent,
+      user,
     });
 
     await this.commentsRepository.save(comment);
@@ -66,7 +71,14 @@ export class CommentsService {
   async getCommentsByPostId(postId: number): Promise<CommentRO[]> {
     const comments = await this.commentsRepository.find({
       where: { postId },
-      relations: ['replies', 'likes'],
+      relations: {
+        replies: {
+          user: true,
+          likes: true, // replies에 존재하는 좋아요도 함께 가져올 수 있도록 한다.
+        },
+        user: true,
+        likes: true,
+      },
       order: { createdAt: 'DESC' },
     });
 
@@ -91,11 +103,14 @@ export class CommentsService {
       });
     };
 
-    console.log('filterComments : ', processComments(filterComments));
+    // console.log('filterComments : ', processComments(filterComments));
     return processComments(filterComments);
   }
 
-  async likeComment(commentId: number, userId: number): Promise<void> {
+  async toggleLikeComment(
+    commentId: number,
+    userId: number,
+  ): Promise<CommentLike> {
     const comment = await this.getCommentById(commentId);
 
     const like = await this.commentLikeRepository.findOne({
@@ -103,12 +118,13 @@ export class CommentsService {
     });
 
     const commentLike = this.commentLikeRepository.create({
+      id: like?.id,
       userId,
       isLike: !like?.isLike,
       comment,
     });
 
-    await this.commentLikeRepository.save(commentLike);
+    return await this.commentLikeRepository.save(commentLike);
   }
 
   async addLikeOrDislike(

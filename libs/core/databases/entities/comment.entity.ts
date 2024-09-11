@@ -3,6 +3,7 @@ import { Entity, OneToMany, ManyToOne } from 'typeorm';
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
 import { CommentLike } from './comment.like.entity';
+import { Users } from './user.entity';
 
 @Entity('comments')
 export class Comments extends NumberPkEntity {
@@ -33,6 +34,10 @@ export class Comments extends NumberPkEntity {
   @Column({ type: 'text', nullable: false, description: '댓글 내용' })
   content: string;
 
+  @ManyToOne(() => Users, (user) => user.comments) // 댓글과 유저는 다대일 관계
+  user: Users;
+
+  // 댓글을 작성한 사용자
   @ManyToOne(() => Comments, (comment) => comment.replies)
   parent: Comments;
 

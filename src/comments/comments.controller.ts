@@ -21,7 +21,7 @@ export class CommentsController {
     @Param('commentId') commentId: number,
   ) {
     const { id: userId } = user;
-    return this.commentsService.likeComment(commentId, userId);
+    return this.commentsService.toggleLikeComment(commentId, userId);
   }
 
   @Get(':id/likes')

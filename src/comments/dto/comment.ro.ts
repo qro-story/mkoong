@@ -39,6 +39,10 @@ export class CommentRO extends CreateCommentDTO {
   })
   createdAt: Date;
 
+  // todo: 이후에 user의 RO를 추가하여야 한다.
+  // @Property({})
+  // user: UserRO;
+
   @Property({
     type: 'array',
     schema: CommentRO,

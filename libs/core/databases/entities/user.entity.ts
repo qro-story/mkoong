@@ -3,12 +3,14 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
 import { MBTI } from 'src/users/types/mbti.type';
+import { Comments } from './comment.entity';
 
 @Entity('users')
 export class Users extends NumberPkEntity {
@@ -59,4 +61,7 @@ export class Users extends NumberPkEntity {
   // prettier-ignore
   @Column({ name: 'p_j_ratio', type: 'int', nullable: true, description: 'P와 J의 비율' })
   pjRatio?: number;
+
+  @OneToMany(() => Comments, (comment) => comment.user)
+  comments: Comments[]; // 사용자가 작성한 댓글 목록
 }
