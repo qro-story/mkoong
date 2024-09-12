@@ -31,6 +31,7 @@ export class PhoneJwtStrategy extends PassportStrategy(Strategy, 'phone') {
     };
   }
 }
+
 @Injectable()
 export class PhoneAuthGuard extends AuthGuard('phone') {
   handleRequest<TUser = any>(

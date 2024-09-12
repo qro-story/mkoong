@@ -157,8 +157,6 @@ export function Route(options: RouteOptions) {
     );
   }
 
-  console.log(options.guards);
-
   if (options.guards && options.guards.length > 0) {
     decorators.push(UseGuards(...options.guards));
   }

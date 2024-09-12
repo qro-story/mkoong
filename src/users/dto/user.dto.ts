@@ -31,3 +31,12 @@ export class CreateAndUpdateNicknameDTO {
   @Property({ type: 'string', required: true, description: '생성할 닉네임' })
   nickname: string;
 }
+export class CreateAndUpdateMbtiDTO {
+  @Property({
+    type: 'string',
+    enum: MBTI,
+    required: true,
+    description: 'MBTI 타입 ',
+  })
+  mbti: string;
+}

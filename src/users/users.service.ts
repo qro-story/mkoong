@@ -9,6 +9,7 @@ import { PostsService } from 'src/posts/posts.service';
 import { CommonError, ERROR } from '@libs/core/types';
 import { PhoneTokenPayload } from 'src/passport/interfaces/passport.interface';
 import { PassportService } from 'src/passport/passport.service';
+import { MBTI, MbtiResponse } from './types/mbti.type';
 
 @Injectable()
 export class UsersService extends AbstractRepository<Users> {
@@ -116,5 +117,18 @@ export class UsersService extends AbstractRepository<Users> {
       ...user,
       nickname,
     });
+  }
+  async getMbtiInfo(type: string) {
+    const mbtiResponse = MbtiResponse;
+    const mbtiType = type.toUpperCase();
+
+    if (Object.values(MBTI).includes(mbtiType as MBTI)) {
+      return mbtiResponse[mbtiType as keyof typeof MbtiResponse];
+    } else {
+      throw new CommonError({
+        error: ERROR.INVALID_PARAMS,
+        message: '유효하지 않은 MBTI 유형입니다.',
+      });
+    }
   }
 }

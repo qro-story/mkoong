@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { HttpMethodEnum, Route } from '@libs/core/decorators';
 import { ApiTags } from '@nestjs/swagger';
@@ -9,7 +17,11 @@ import {
 } from 'src/passport/interfaces/passport.interface';
 import { PostRO } from 'src/posts/dto/post.ro';
 import { PhoneAuthGuard } from 'src/passport/strategies/phone.strategy';
-import { CreateAndUpdateNicknameDTO, UpdateMbtiDTO } from './dto/user.dto';
+import {
+  CreateAndUpdateMbtiDTO,
+  CreateAndUpdateNicknameDTO,
+  UpdateMbtiDTO,
+} from './dto/user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -65,6 +77,28 @@ export class UsersController {
     const { nickname } = dto;
     return this.usersService.updateNickname(+id, nickname);
   }
+
+  @Route({
+    path: '/mbti/:type',
+    method: HttpMethodEnum.GET,
+    summary: '유저가 선택한 MBTI에 대한 정보 가져오기',
+  })
+  async getMbtiInfo(@Param('type') type: string) {
+    console.log(type);
+    return await this.usersService.getMbtiInfo(type);
+  }
+
+  @Route({
+    path: '/mbti',
+    auth: true,
+    guards: [PhoneAuthGuard],
+    method: HttpMethodEnum.POST,
+    summary: '첫번째 MBTI 설정',
+  })
+  async postMbti(
+    @PhoneAuthInfo() phoneAuth: PhoneTokenPayload,
+    @Body() dto: CreateAndUpdateMbtiDTO,
+  ) {}
 
   @Route({
     path: '/mbti',
