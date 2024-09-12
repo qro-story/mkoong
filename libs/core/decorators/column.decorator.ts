@@ -15,20 +15,18 @@ import {
 } from 'typeorm';
 import { CommonError, ERROR } from '../types';
 
-type ColumnType = OriginalColumnType | 'password' | 'timezone' | 'any';
+type ColumnType = OriginalColumnType | 'password' | 'any';
 
-enum Timezone {
+export enum Timezone {
   ASIA_SEOUL = 'Asia/Seoul',
   UTC = 'UTC',
 }
-
 export interface ColumnOptions {
   type: ColumnType; // 컬럼 타입
   default?: any; // 기본값
   name?: string; // 컬럼 이름
   description?: string; // 컬럼 설명
   enum?: any[] | Record<string, any>; // 열거형 타입
-  exclude?: boolean; // 제외 여부
   json?: boolean; // JSON 타입 여부
   length?: number; // 길이 (문자열 타입에 사용)
   nullable?: boolean; // NULL 허용 여부
@@ -117,15 +115,15 @@ export function Column(options: ColumnOptions) {
       decorators.push(Type(() => String));
       break;
 
-    case 'timezone':
-      column.type = 'varchar';
-      column.length = 10;
-      property.enum = Timezone;
-      decorators.push(IsEnum(Timezone));
-      decorators.push(OriginalColumn(column));
-      decorators.push(IsString);
-      decorators.push(Type(() => String));
-      break;
+    // case 'timezone':
+    //   column.type = 'varchar';
+    //   column.length = 10;
+    //   property.enum = Timezone;
+    //   decorators.push(IsEnum(Timezone));
+    //   decorators.push(OriginalColumn(column));
+    //   decorators.push(IsString);
+    //   decorators.push(Type(() => String));
+    //   break;
 
     case 'float':
     case 'double':
@@ -138,9 +136,6 @@ export function Column(options: ColumnOptions) {
       decorators.push(Type(() => Number));
       break;
 
-    case 'tinyint':
-    case 'smallint':
-    case 'mediumint':
     case 'int':
     case 'bigint':
       column.width = options.length;
@@ -175,10 +170,6 @@ export function Column(options: ColumnOptions) {
 
     case 'any':
       decorators.push(Type(() => Object));
-      break;
-
-    case 'uuid':
-      decorators.push(OriginalColumn(column));
       break;
   }
 

@@ -65,7 +65,7 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     );
   }
 
-  async create(entity: DeepPartial<TEntity>): Promise<TEntity> {
+  async upsert(entity: DeepPartial<TEntity>): Promise<TEntity> {
     const repository = this.getRepository();
 
     // const id: TEntity = await repository.findOne({
@@ -95,9 +95,9 @@ export class AbstractRepository<TEntity extends AbstractEntity> {
     return await this.getRepository().insert(entity);
   }
 
-  async upsert(entity: DeepPartial<TEntity>): Promise<TEntity> {
-    return await this.getRepository().save(entity);
-  }
+  // async upsert(entity: DeepPartial<TEntity>): Promise<TEntity> {
+  //   return await this.getRepository().save(entity);
+  // }
 
   async findAll(
     options: FindAllOptions<TEntity> | any,

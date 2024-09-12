@@ -10,6 +10,7 @@ import {
   VerifyPhoneAuthRandomNumberDTO,
 } from './dto/passport.dto';
 import { RefreshTokenGuard } from './strategies/refresh.jwt.strategy';
+import { PhoneAuthRO } from './dto/passport.ro';
 
 @ApiTags('passport-auth')
 @Controller('passport')
@@ -24,23 +25,31 @@ export class PassportController {
   })
   async requestPhoneAuth(@Body() dto: PassportPhoneAuthDTO) {
     const { phoneNumber } = dto;
-    await this.passportService.sendRandomNumber(phoneNumber);
-    return '인증 번호가 발송되었습니다.';
+    const verificationCode =
+      await this.passportService.sendRandomNumber(phoneNumber);
+    return `인증 번호 ${verificationCode} 가 발송되었습니다.`;
   }
 
   @Route({
     path: '/verify/phone/auth',
     method: 'POST',
     summary: '전화번호 인증 검증하기',
+    transactional: true,
     description: '인증 번호를 검증하고 성공 시 verifiedAt을 업데이트합니다.',
+    transform: PhoneAuthRO,
   })
-  async verifyPhoneAuth(@Body() dto: VerifyPhoneAuthRandomNumberDTO) {
+  async verifyPhoneAuth(
+    @Body() dto: VerifyPhoneAuthRandomNumberDTO,
+  ): Promise<PhoneAuthRO> {
     const { phoneNumber, verificationCode } = dto;
-    await this.passportService.verifyRandomNumber(
+    const phoneTokenPayload = await this.passportService.verifyRandomNumber(
       phoneNumber,
       verificationCode,
     );
-    return '전화번호 인증이 완료되었습니다.';
+    return {
+      message: '전화번호 인증이 완료되었습니다.',
+      accessToken: phoneTokenPayload,
+    };
   }
 
   @Route({

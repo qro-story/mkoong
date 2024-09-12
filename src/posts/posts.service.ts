@@ -32,7 +32,7 @@ export class PostsService extends AbstractRepository<Posts> {
   async createPosts(userId: number, dto: CreatePostDTO) {
     await this.userService.getUserById(userId);
 
-    const post = await this.create({
+    const post = await this.upsert({
       userId,
       ...dto,
     });

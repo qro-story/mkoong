@@ -1,4 +1,4 @@
-import { Controller, Body, Param } from '@nestjs/common';
+import { Controller, Body, Param, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDTO } from './dto/post.dto';
 import { Route } from '@libs/core/decorators';
@@ -69,6 +69,7 @@ export class PostsController {
   })
   async create(@UserInfo() user: TokenPayload, @Body() dto: CreatePostDTO) {
     const { id: userId } = user;
+    console.log('user : ', user);
 
     return this.postsService.createPosts(userId, dto);
   }

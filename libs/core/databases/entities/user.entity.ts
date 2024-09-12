@@ -22,10 +22,6 @@ export class Users extends NumberPkEntity {
   @Column({ type: 'varchar', length: 50, nullable: true, description: '사용자명' })
   username: string;
 
-  // prettier-ignore
-  @Column({ name: 'phone_number', type: 'varchar', length: 20, description: '핸드폰 번호',  nullable: true})
-  phoneNumber: string;
-
   @Column({ type: 'date', description: '생년월일', nullable: true })
   birth: Date;
 

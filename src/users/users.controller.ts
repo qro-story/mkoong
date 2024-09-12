@@ -1,25 +1,54 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateMbtiDto, UpdateNicknameDto } from './dto/update-user.dto';
-import { Route } from '@libs/core/decorators';
+import { HttpMethodEnum, Route } from '@libs/core/decorators';
 import { ApiTags } from '@nestjs/swagger';
-import { UserInfo } from '@libs/core/decorators/info.decorator';
-import { TokenPayload } from 'src/passport/interfaces/passport.interface';
+import { PhoneAuthInfo, UserInfo } from '@libs/core/decorators/info.decorator';
+import {
+  PhoneTokenPayload,
+  TokenPayload,
+} from 'src/passport/interfaces/passport.interface';
 import { PostRO } from 'src/posts/dto/post.ro';
+import { PhoneAuthGuard } from 'src/passport/strategies/phone.strategy';
+import { CreateAndUpdateNicknameDTO, UpdateMbtiDTO } from './dto/user.dto';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // @Route({
+  //   path: '/setting',
+  //   method: 'post',
+  //   auth: true,
+  //   summary: '약관 동의에 대한 여부 -> 추후에 없어질 예정',
+  // })
+  // updateSettings(@Param('id') id: string, @Body() settingsDto: any) {
+  //   return this.usersService.updateSettings(+id, settingsDto);
+  // }
+
   @Route({
-    path: '/setting',
-    method: 'post',
-    auth: true,
-    summary: '약관 동의에 대한 여부 -> 추후에 없어질 예정',
+    path: 'nickname/unique',
+    method: HttpMethodEnum.GET,
+    summary: '닉네임 중복 검사 ',
   })
-  updateSettings(@Param('id') id: string, @Body() settingsDto: any) {
-    return this.usersService.updateSettings(+id, settingsDto);
+  async checkNicknameUnique(@Body() dto: CreateAndUpdateNicknameDTO) {
+    const { nickname } = dto;
+    return this.usersService.isNicknameUnique(nickname);
+  }
+
+  @Route({
+    path: '/nickname',
+    method: HttpMethodEnum.POST,
+    guards: [PhoneAuthGuard],
+    summary: '최초 닉네임 설정',
+  })
+  @UseGuards(PhoneAuthGuard)
+  async createNickname(
+    @Body() dto: CreateAndUpdateNicknameDTO,
+    @PhoneAuthInfo() phoneAuth: PhoneTokenPayload,
+  ) {
+    const { nickname } = dto;
+    return await this.usersService.createNickname(nickname, phoneAuth);
   }
 
   @Route({
@@ -30,7 +59,7 @@ export class UsersController {
   })
   updateNickname(
     @UserInfo() user: TokenPayload,
-    @Body() dto: UpdateNicknameDto,
+    @Body() dto: CreateAndUpdateNicknameDTO,
   ) {
     const { id } = user;
     const { nickname } = dto;
@@ -43,7 +72,7 @@ export class UsersController {
     auth: true,
     summary: 'MBTI 변경',
   })
-  updateMbti(@UserInfo() user: TokenPayload, @Body() dto: UpdateMbtiDto) {
+  updateMbti(@UserInfo() user: TokenPayload, @Body() dto: UpdateMbtiDTO) {
     const { id } = user;
     const { mbti } = dto;
     return this.usersService.updateMbti(+id, mbti);
@@ -59,16 +88,6 @@ export class UsersController {
   getUserPosts(@UserInfo() user: TokenPayload) {
     const { id } = user;
     return this.usersService.getUserPosts(+id);
-  }
-
-  @Get(':id/selected-posts')
-  getSelectedPosts(@Param('id') id: string) {
-    return this.usersService.getSelectedPosts(+id);
-  }
-
-  @Post(':id/review')
-  sendReview(@Param('id') id: string, @Body() reviewDto: any) {
-    return this.usersService.sendReview(+id, reviewDto);
   }
 
   @Route({

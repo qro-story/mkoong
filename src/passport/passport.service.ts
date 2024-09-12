@@ -9,14 +9,18 @@ import { Repository, DataSource } from 'typeorm';
 import { CreatePassportDto, SignInDto } from './dto/passport.dto';
 import { CommonError, ERROR, ERROR_CODE } from '@libs/core/types';
 import * as bcrypt from 'bcrypt'; // bcrypt 라이브러리 추가
-import { TokenPayload } from './interfaces/passport.interface';
+import {
+  PhoneTokenPayload,
+  TokenPayload,
+} from './interfaces/passport.interface';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { PassportProviderType } from './interfaces/passport.type';
 
 @Injectable()
 export class PassportService extends AbstractRepository<PassportAuth> {
   private generateToken(
-    payload: TokenPayload,
+    payload: TokenPayload | PhoneTokenPayload,
     tokenSecret: string,
     tokenExpired: string,
   ): string {
@@ -37,11 +41,13 @@ export class PassportService extends AbstractRepository<PassportAuth> {
     super(passportAuthRepository, req);
   }
   async getPassportAuthByPhone(phoneNumber: string) {
+    console.log('phoneNumber : ', phoneNumber);
     const passportAuth = await this.passportAuthRepository.findOne({
       where: {
         phoneNumber,
       },
     });
+    console.log('이게 맞아?  : ', passportAuth);
     return passportAuth;
   }
 
@@ -117,6 +123,7 @@ export class PassportService extends AbstractRepository<PassportAuth> {
       this.configService.get('JWT_REFRESH_SECRET'),
       this.configService.get('JWT_REFRESH_EXPIRED'),
     );
+
     // TODO : refresh token 저장
     await this.passportAuthRepository.update(user.id, {
       refresh_token: refreshToken,
@@ -128,23 +135,41 @@ export class PassportService extends AbstractRepository<PassportAuth> {
     };
   }
 
-  async sendRandomNumber(phoneNumber: string): Promise<void> {
+  async sendRandomNumber(phoneNumber: string): Promise<string> {
     const verificationCode = this.generateRandomNumber();
     const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10분 후 만료
 
     // 랜덤 번호 암호화
     const hashedVerificationCode = await bcrypt.hash(verificationCode, 10);
 
-    await this.passportAuthRepository.update(
-      { phoneNumber },
-      { verificationCode: hashedVerificationCode, verificationExpires },
-    );
+    const passport = await this.findOne({
+      where: {
+        phoneNumber,
+      },
+    });
+
+    // todo 인증 완료된 회원의 경우 어떤 플로우인지에 따라서 변경 가능성 O
+    // if (passport && passport.verifiedAt !== null) {
+    //   throw new CommonError({
+    //     error: ERROR.INVALID_REQUEST,
+    //     message: '이미 인증이 완료된 전화번호입니다. 로그인을 진행해주세요',
+    //   });
+    // }
+
+    await this.upsert({
+      id: passport?.id,
+      phoneNumber,
+      provider: PassportProviderType.PHONE,
+      verificationCode: hashedVerificationCode,
+      verificationExpires,
+    });
 
     // TODO: 실제 SMS 발송 로직 구현
-    console.log(`Verification code ${verificationCode} sent to ${phoneNumber}`);
+    console.log(`Verification code를 발송한 것을 추후에 보내야 한다.`);
+    return verificationCode;
   }
 
-  async verifyRandomNumber(phoneNumber: string, code: string): Promise<void> {
+  async verifyRandomNumber(phoneNumber: string, code: string): Promise<string> {
     const passportAuth = await this.passportAuthRepository.findOne({
       where: { phoneNumber },
     });
@@ -168,6 +193,7 @@ export class PassportService extends AbstractRepository<PassportAuth> {
       code,
       passportAuth.verificationCode,
     );
+
     if (!isValidCode) {
       throw new CommonError({
         error: ERROR.INVALID_REQUEST,
@@ -184,6 +210,21 @@ export class PassportService extends AbstractRepository<PassportAuth> {
         verificationExpires: null,
       },
     );
+
+    const tokenPayload: PhoneTokenPayload = {
+      passportAuthId: passportAuth.id,
+      phoneNumber,
+    };
+
+    const accessToken = this.generateToken(
+      tokenPayload,
+      this.configService.get('JWT_ACCESS_SECRET'),
+      this.configService.get('JWT_ACCESS_EXPIRED'),
+    );
+    await this.usersService.upsert({
+      passportAuthId: passportAuth.id,
+    });
+    return accessToken;
   }
 
   private generateRandomNumber(): string {

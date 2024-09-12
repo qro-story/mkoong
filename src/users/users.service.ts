@@ -1,6 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Users } from '@libs/core/databases/entities/user.entity';
 import { AbstractRepository } from '@libs/core/databases';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +7,8 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { PostsService } from 'src/posts/posts.service';
 import { CommonError, ERROR } from '@libs/core/types';
+import { PhoneTokenPayload } from 'src/passport/interfaces/passport.interface';
+import { PassportService } from 'src/passport/passport.service';
 
 @Injectable()
 export class UsersService extends AbstractRepository<Users> {
@@ -16,6 +16,8 @@ export class UsersService extends AbstractRepository<Users> {
     @Inject(REQUEST) req: Request,
     @InjectRepository(Users) private readonly userRepository: Repository<Users>,
     private readonly postsService: PostsService,
+    @Inject(forwardRef(() => PassportService))
+    private readonly passportService: PassportService,
   ) {
     super(userRepository, req);
   }
@@ -46,11 +48,6 @@ export class UsersService extends AbstractRepository<Users> {
     return posts;
   }
 
-  async updateSettings(id: number, settingsDto: any) {
-    // Implement logic to update user settings
-    return `Updated settings for user ${id}`;
-  }
-
   async updateNickname(userId: number, nickname: string) {
     await this.getUserById(userId);
 
@@ -67,13 +64,57 @@ export class UsersService extends AbstractRepository<Users> {
     return updateToUser;
   }
 
-  async getSelectedPosts(id: number) {
-    // Implement logic to get selected posts
-    return `Retrieved selected posts for user ${id}`;
+  async isNicknameUnique(nickname: string): Promise<boolean> {
+    const existingUser = await this.userRepository.findOne({
+      where: { nickname },
+    });
+
+    return existingUser ? false : true;
   }
 
-  async sendReview(id: number, reviewDto: any) {
-    // Implement logic to send a review
-    return `Sent review for user ${id}`;
+  async createNickname(nickname: string, phoneAuth: PhoneTokenPayload) {
+    const { passportAuthId, phoneNumber } = phoneAuth;
+
+    const passport =
+      await this.passportService.getPassportAuthByPhone(phoneNumber);
+    if (!passport) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_DATA,
+        message: '입력하신 번호에 해당하는 Auth가 존재하지 않습니다.',
+      });
+    }
+    if (passport.id !== passportAuthId) {
+      throw new CommonError({
+        error: ERROR.INVALID_TOKEN,
+        message: '토큰에 대한 정보가 정확하지 않습니다.',
+      });
+    }
+
+    // todo 닉네임 중복 검사는 따로 API 요청을 한다.
+    // const isUnique = await this.isNicknameUnique(nickname);
+    // if (!isUnique) {
+    //   throw new CommonError({
+    //     error: ERROR.ALREADY_USED_DATA,
+    //     message: '이미 사용 중인 닉네임입니다.',
+    //   });
+    // }
+
+    const user = await this.findOne({
+      where: {
+        passportAuthId,
+      },
+    });
+
+    if (!user) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_USER,
+        message: '사용자를 찾을 수 없습니다.',
+      });
+    }
+
+    return await this.upsert({
+      ...user,
+      nickname,
+    });
   }
 }

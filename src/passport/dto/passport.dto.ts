@@ -38,12 +38,16 @@ export class PassportPhoneAuthDTO {
 }
 
 export class VerifyPhoneAuthRandomNumberDTO {
-  @IsString()
-  @IsNotEmpty()
+  @Property({
+    type: 'string',
+    description: '인증에 필요한 핸드폰 번호 => 이후에 정규식으로 변환 예정',
+  })
   phoneNumber: string;
 
-  @IsString()
-  @IsNotEmpty()
+  @Property({
+    type: 'string',
+    description: '발급 받은 인증번호',
+  })
   verificationCode: string;
 }
 

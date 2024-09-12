@@ -24,7 +24,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: TokenPayload) {
     // payload는 위의 JWT의 payload를 인자로 받는다.
-    console.log('payload', payload);
+    console.log('jwt payload', payload);
+
     return { id: payload.id, email: payload.email };
   }
 }

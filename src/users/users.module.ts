@@ -4,10 +4,14 @@ import { UsersController } from './users.controller';
 import { Users } from '@libs/core/databases/entities/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModule } from 'src/posts/posts.module';
-import { Posts } from '@libs/core/databases/entities/post.entity';
+import { PassportModule } from 'src/passport/passport.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), forwardRef(() => PostsModule)],
+  imports: [
+    TypeOrmModule.forFeature([Users]),
+    forwardRef(() => PostsModule),
+    forwardRef(() => PassportModule),
+  ],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

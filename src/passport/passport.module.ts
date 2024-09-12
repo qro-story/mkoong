@@ -7,6 +7,7 @@ import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RefreshTokenGuard } from './strategies/refresh.jwt.strategy';
+import { PhoneJwtStrategy } from './strategies/phone.strategy';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { RefreshTokenGuard } from './strategies/refresh.jwt.strategy';
     JwtModule,
   ],
   controllers: [PassportController],
-  providers: [PassportService, JwtStrategy],
+  providers: [PassportService, JwtStrategy, PhoneJwtStrategy],
   exports: [PassportService],
 })
 export class PassportModule {}

@@ -27,6 +27,7 @@ import { JwtAuthGuard } from 'src/passport/strategies/jwt.strategy';
 import { IAuthGuard, Type } from '@nestjs/passport';
 import { Resolvable, Throttle } from '@nestjs/throttler';
 import { CommonError, ERROR } from '../types';
+import { PhoneAuthGuard } from 'src/passport/strategies/phone.strategy';
 
 const getEnumKeyByValue = (_enum: any, _value: any) => {
   const indexOfS = Object.values(_enum).indexOf(_value as unknown);
@@ -55,7 +56,6 @@ export interface RouteOptions {
   summary?: string; // 요약
   description?: string; // 설명
   tags?: string[]; // 태그 배열
-  roles?: string[]; // 역할 배열
   guards?: Type<IAuthGuard | CanActivate>[];
   redirect?: boolean; // 리다이렉트 여부
   exclude?: boolean; // 엔드포인트 제외 여부
@@ -117,9 +117,8 @@ export function Route(options: RouteOptions) {
     options.guards = options.guards || [];
 
     options.guards.unshift(JwtAuthGuard);
-    decorators.push(ApiBearerAuth());
 
-    decorators.push(UseGuards(...options.guards));
+    decorators.push(ApiBearerAuth());
 
     decorators.push(
       ApiResponse({
@@ -158,28 +157,10 @@ export function Route(options: RouteOptions) {
     );
   }
 
+  console.log(options.guards);
+
   if (options.guards && options.guards.length > 0) {
     decorators.push(UseGuards(...options.guards));
-  }
-
-  // Roles
-  if (options.roles) {
-    decorators.push(
-      ApiResponse({
-        status: 401,
-        description: 'Unauthorized',
-      }),
-    );
-    decorators.push(
-      ApiResponse({
-        status: 403,
-        description: 'AccessNotAllow',
-      }),
-    );
-
-    decorators.push(SetMetadata('roles', options.roles));
-
-    decorators.push(ApiBearerAuth());
   }
 
   decorators.push(ApiConsumes('application/x-www-form-urlencoded'));
