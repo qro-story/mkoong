@@ -8,7 +8,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { CreatePassportDto, SignInDto } from './dto/passport.dto';
 import { CommonError, ERROR } from '@libs/core/types';
-import * as bcrypt from 'bcrypt'; // bcrypt 라이브러리 추가
 import {
   PhoneTokenPayload,
   TokenPayload,
@@ -16,7 +15,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PassportProviderType } from './interfaces/passport.type';
-
+import * as bcrypt from 'bcryptjs';
 @Injectable()
 export class PassportService extends AbstractRepository<PassportAuth> {
   private generateToken(
