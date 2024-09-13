@@ -3,8 +3,17 @@ import { PartialType } from '@nestjs/swagger';
 
 export class VoteOptionDTO {
   @Property({
+    type: 'number',
+    required: false,
+    description: '투표 선택지 ID',
+    example: 1,
+  })
+  id?: number;
+
+  @Property({
     type: 'string',
     description: '투표 선택지',
+
     example: '선택지 1',
   })
   option: string;
@@ -18,7 +27,7 @@ export class VotePostDTO {
   })
   content: string;
 }
-export class CreatePostDTO {
+export class CreateAndUpdatePostDTO {
   @Property({
     type: 'string',
     description: '제목',
@@ -42,4 +51,4 @@ export class CreatePostDTO {
   voteOptions: VoteOptionDTO[];
 }
 
-export class UpdatePostDTO extends PartialType(CreatePostDTO) {}
+export class UpdatePostDTO extends PartialType(CreateAndUpdatePostDTO) {}

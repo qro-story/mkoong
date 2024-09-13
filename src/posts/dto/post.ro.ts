@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/swagger';
-import { CreatePostDTO } from './post.dto';
+import { CreateAndUpdatePostDTO } from './post.dto';
 import { Property } from '@libs/core/decorators';
 import { UserRO } from 'src/users/dto/user.ro';
 

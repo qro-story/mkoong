@@ -1,6 +1,6 @@
 import { Controller, Body, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDTO } from './dto/post.dto';
+import { CreateAndUpdatePostDTO } from './dto/post.dto';
 import { HttpMethodEnum, Route } from '@libs/core/decorators';
 import { UserInfo } from '@libs/core/decorators/info.decorator';
 import { TokenPayload } from 'src/passport/interfaces/passport.interface';
@@ -68,10 +68,11 @@ export class PostsController {
   })
   async updatePost(
     @Param('postId') postId: number,
-    @Body() dto: CreatePostDTO,
+    @Body() dto: CreateAndUpdatePostDTO,
   ) {
     return this.postsService.updateById(+postId, dto);
   }
+
   @Route({
     path: '/',
     method: 'POST',
@@ -80,7 +81,10 @@ export class PostsController {
     summary: '게시글 생성',
     transform: PostRO,
   })
-  async create(@UserInfo() user: TokenPayload, @Body() dto: CreatePostDTO) {
+  async create(
+    @UserInfo() user: TokenPayload,
+    @Body() dto: CreateAndUpdatePostDTO,
+  ) {
     const { id: userId } = user;
     console.log('user : ', user);
 
