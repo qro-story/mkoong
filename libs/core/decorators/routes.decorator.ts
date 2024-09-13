@@ -116,7 +116,11 @@ export function Route(options: RouteOptions) {
   if (options.auth === true) {
     options.guards = options.guards || [];
 
-    options.guards.unshift(JwtAuthGuard);
+    if (options.guards.includes(PhoneAuthGuard)) {
+      options.guards.unshift(PhoneAuthGuard);
+    } else {
+      options.guards.unshift(JwtAuthGuard);
+    }
 
     decorators.push(ApiBearerAuth());
 

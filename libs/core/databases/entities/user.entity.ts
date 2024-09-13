@@ -1,11 +1,4 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  Index,
-  OneToMany,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, OneToMany } from 'typeorm';
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';

@@ -4,13 +4,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import helmet from 'helmet';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from 'libs/core/filters/http.exception.filter';
 import { PassportModule } from './passport/passport.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { CommentsModule } from './comments/comments.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -56,6 +57,9 @@ import { CommentsModule } from './comments/comments.module';
     PostsModule,
     UsersModule,
     CommentsModule,
+    JwtModule.register({
+      global: true,
+    }),
   ],
   controllers: [AppController],
   providers: [

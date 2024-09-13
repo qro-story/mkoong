@@ -1,7 +1,7 @@
-import { Controller, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Body, Param } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDTO } from './dto/post.dto';
-import { Route } from '@libs/core/decorators';
+import { HttpMethodEnum, Route } from '@libs/core/decorators';
 import { UserInfo } from '@libs/core/decorators/info.decorator';
 import { TokenPayload } from 'src/passport/interfaces/passport.interface';
 import { PostOwnerGuard } from '@libs/core/guards/post.owner.guard';
@@ -35,20 +35,6 @@ export class PostsController {
   }
 
   @Route({
-    path: '/:postId',
-    method: 'PATCH',
-    guards: [PostOwnerGuard],
-    auth: true,
-    summary: '게시글 수정, 게시글의 수정은 작성자만이 가능하다',
-  })
-  async updatePost(
-    @Param('postId') postId: number,
-    @Body() dto: CreatePostDTO,
-  ) {
-    return this.postsService.updateById(+postId, dto);
-  }
-
-  @Route({
     path: '/:postId/comments',
     method: 'GET',
     summary: '특정 게시글에 달린 댓글과 대댓글 가져오기',
@@ -62,9 +48,34 @@ export class PostsController {
   }
 
   @Route({
+    path: '/me',
+    method: HttpMethodEnum.GET,
+    auth: true,
+    summary: '내가 쓴 게시물 가져오기',
+  })
+  async getMyPosts(@UserInfo() user: TokenPayload) {
+    const { id: userId } = user;
+    return this.postsService.getMyPosts(userId);
+  }
+
+  @Route({
+    path: '/:postId',
+    method: 'PATCH',
+    guards: [PostOwnerGuard],
+    auth: true,
+    summary: '게시글 수정, 게시글의 수정은 작성자만이 가능하다',
+  })
+  async updatePost(
+    @Param('postId') postId: number,
+    @Body() dto: CreatePostDTO,
+  ) {
+    return this.postsService.updateById(+postId, dto);
+  }
+  @Route({
     path: '/',
     method: 'POST',
     auth: true,
+    transactional: true,
     summary: '게시글 생성',
   })
   async create(@UserInfo() user: TokenPayload, @Body() dto: CreatePostDTO) {

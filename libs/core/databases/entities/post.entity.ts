@@ -1,13 +1,8 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  Index,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, OneToMany } from 'typeorm';
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
+import { Votes } from './vote.entity';
 
 @Entity('posts')
 export class Posts extends NumberPkEntity {
@@ -35,4 +30,7 @@ export class Posts extends NumberPkEntity {
     description: '내용',
   })
   content: string;
+
+  @OneToMany(() => Votes, (vote) => vote.post, { cascade: true })
+  votes: Votes[];
 }

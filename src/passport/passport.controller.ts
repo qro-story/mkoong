@@ -1,4 +1,4 @@
-import { Body, CanActivate, Controller } from '@nestjs/common';
+import { Body, Controller } from '@nestjs/common';
 import { PassportService } from './passport.service';
 import { ApiTags } from '@nestjs/swagger';
 import { HttpMethodEnum, Route } from '@libs/core/decorators';

@@ -5,10 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Posts } from '@libs/core/databases/entities/post.entity';
 import { UsersModule } from 'src/users/users.module';
 import { CommentsModule } from 'src/comments/comments.module';
+import { Votes } from '@libs/core/databases/entities/vote.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Posts]),
+    TypeOrmModule.forFeature([Posts, Votes]),
     forwardRef(() => UsersModule),
     forwardRef(() => CommentsModule),
   ],

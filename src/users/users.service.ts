@@ -118,9 +118,9 @@ export class UsersService extends AbstractRepository<Users> {
       nickname,
     });
   }
-  async getMbtiInfo(type: string) {
+  async getMbtiInfo(mbti: string) {
     const mbtiResponse = MbtiResponse;
-    const mbtiType = type.toUpperCase();
+    const mbtiType = mbti.toUpperCase();
 
     if (Object.values(MBTI).includes(mbtiType as MBTI)) {
       return mbtiResponse[mbtiType as keyof typeof MbtiResponse];
@@ -130,5 +130,27 @@ export class UsersService extends AbstractRepository<Users> {
         message: '유효하지 않은 MBTI 유형입니다.',
       });
     }
+  }
+
+  async postMbti(phoneAuth: PhoneTokenPayload, mbti: string) {
+    const { passportAuthId } = phoneAuth;
+
+    const user = await this.findOne({
+      where: {
+        passportAuthId,
+      },
+    });
+
+    if (!user) {
+      throw new CommonError({
+        error: ERROR.NO_EXISTS_USER,
+        message: '해당 passportAuthId를 갖는 user는 존재하지 않습니다. ',
+      });
+    }
+
+    return this.upsert({
+      ...user,
+      mbti,
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable, BadRequestException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { AbstractRepository } from '@libs/core/databases';
 import { PassportAuth } from '@libs/core/databases/entities/passport.auth.entity';
@@ -7,7 +7,7 @@ import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { CreatePassportDto, SignInDto } from './dto/passport.dto';
-import { CommonError, ERROR, ERROR_CODE } from '@libs/core/types';
+import { CommonError, ERROR } from '@libs/core/types';
 import * as bcrypt from 'bcrypt'; // bcrypt 라이브러리 추가
 import {
   PhoneTokenPayload,
@@ -137,7 +137,8 @@ export class PassportService extends AbstractRepository<PassportAuth> {
 
   async sendRandomNumber(phoneNumber: string): Promise<string> {
     const verificationCode = this.generateRandomNumber();
-    const verificationExpires = new Date(Date.now() + 10 * 60 * 1000); // 10분 후 만료
+
+    const verificationExpires = new Date(Date.now() + 5 * 60 * 1000); // 5분 후 만료
 
     // 랜덤 번호 암호화
     const hashedVerificationCode = await bcrypt.hash(verificationCode, 10);
@@ -201,6 +202,8 @@ export class PassportService extends AbstractRepository<PassportAuth> {
       });
     }
 
+    console.log(passportAuth);
+
     // 인증 성공 시 verifiedAt 업데이트
     await this.passportAuthRepository.update(
       { id: passportAuth.id },
@@ -218,10 +221,18 @@ export class PassportService extends AbstractRepository<PassportAuth> {
 
     const accessToken = this.generateToken(
       tokenPayload,
-      this.configService.get('JWT_ACCESS_SECRET'),
-      this.configService.get('JWT_ACCESS_EXPIRED'),
+      this.configService.get('JWT_PHONE_SECRET'),
+      this.configService.get('JWT_PHONE_EXPIRED'),
     );
+
+    const user = await this.usersService.findOne({
+      where: {
+        passportAuthId: passportAuth.id,
+      },
+    });
+
     await this.usersService.upsert({
+      id: user?.id,
       passportAuthId: passportAuth.id,
     });
     return accessToken;

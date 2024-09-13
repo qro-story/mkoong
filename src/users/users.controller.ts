@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
+import { Controller, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { HttpMethodEnum, Route } from '@libs/core/decorators';
 import { ApiTags } from '@nestjs/swagger';
@@ -52,9 +44,9 @@ export class UsersController {
     path: '/nickname',
     method: HttpMethodEnum.POST,
     guards: [PhoneAuthGuard],
+    auth: true,
     summary: '최초 닉네임 설정',
   })
-  @UseGuards(PhoneAuthGuard)
   async createNickname(
     @Body() dto: CreateAndUpdateNicknameDTO,
     @PhoneAuthInfo() phoneAuth: PhoneTokenPayload,
@@ -84,7 +76,6 @@ export class UsersController {
     summary: '유저가 선택한 MBTI에 대한 정보 가져오기',
   })
   async getMbtiInfo(@Param('type') type: string) {
-    console.log(type);
     return await this.usersService.getMbtiInfo(type);
   }
 
@@ -98,7 +89,11 @@ export class UsersController {
   async postMbti(
     @PhoneAuthInfo() phoneAuth: PhoneTokenPayload,
     @Body() dto: CreateAndUpdateMbtiDTO,
-  ) {}
+  ) {
+    const { mbti } = dto;
+
+    return await this.usersService.postMbti(phoneAuth, mbti);
+  }
 
   @Route({
     path: '/mbti',

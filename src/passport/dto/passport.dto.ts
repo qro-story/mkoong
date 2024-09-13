@@ -1,6 +1,5 @@
 import { Property, Schema } from '@libs/core/decorators';
 import { PickType } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
 
 @Schema({ allowUnknown: false })
 export class PassportAuth {
@@ -33,6 +32,7 @@ export class PassportPhoneAuthDTO {
   @Property({
     type: 'string',
     description: '인증에 필요한 핸드폰 번호 => 이후에 정규식으로 변환 예정',
+    example: '01024087489',
   })
   phoneNumber: string;
 }
@@ -41,6 +41,7 @@ export class VerifyPhoneAuthRandomNumberDTO {
   @Property({
     type: 'string',
     description: '인증에 필요한 핸드폰 번호 => 이후에 정규식으로 변환 예정',
+    example: '01024087489',
   })
   phoneNumber: string;
 

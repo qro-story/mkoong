@@ -1,6 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreatePostDTO } from './dto/post.dto';
-import { TokenPayload } from 'src/passport/interfaces/passport.interface';
 import { Repository } from 'typeorm';
 import { Posts } from '@libs/core/databases/entities/post.entity';
 import { AbstractRepository } from '@libs/core/databases';
@@ -8,12 +7,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { UsersService } from 'src/users/users.service';
+import { Votes } from '@libs/core/databases/entities/vote.entity';
 
 @Injectable()
 export class PostsService extends AbstractRepository<Posts> {
   constructor(
     @InjectRepository(Posts)
     private readonly postsRepository: Repository<Posts>,
+    @InjectRepository(Votes)
+    private readonly votesRepository: Repository<Votes>,
     @Inject(REQUEST) req: Request,
     @Inject(forwardRef(() => UsersService))
     private readonly userService: UsersService,
@@ -32,10 +34,25 @@ export class PostsService extends AbstractRepository<Posts> {
   async createPosts(userId: number, dto: CreatePostDTO) {
     await this.userService.getUserById(userId);
 
-    const post = await this.upsert({
+    const { title, content, voteOptions } = dto;
+
+    const post = this.postsRepository.create({
       userId,
-      ...dto,
+      content,
+      title,
     });
+
+    // 투표 옵션 생성
+    if (voteOptions && voteOptions.length > 0) {
+      post.votes = voteOptions.map((voteOption) =>
+        this.votesRepository.create({
+          option: voteOption.option,
+          post,
+        }),
+      );
+    }
+
+    await this.postsRepository.save(post);
 
     return post;
   }
