@@ -25,8 +25,6 @@ import { TimeoutInterceptor } from '../interceptors';
 import { TransactionInterceptor } from '../interceptors/transaction.interceptor';
 import { JwtAuthGuard } from 'src/passport/strategies/jwt.strategy';
 import { IAuthGuard, Type } from '@nestjs/passport';
-import { Resolvable, Throttle } from '@nestjs/throttler';
-import { CommonError, ERROR } from '../types';
 import { PhoneAuthGuard } from 'src/passport/strategies/phone.strategy';
 
 const getEnumKeyByValue = (_enum: any, _value: any) => {

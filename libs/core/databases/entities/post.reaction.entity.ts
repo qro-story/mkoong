@@ -1,28 +1,21 @@
-import {
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  Index,
-  UpdateDateColumn,
-} from 'typeorm';
-
+import { Entity, ManyToOne } from 'typeorm';
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
-import { REACTION_TYPE } from '@libs/core/constants/enums';
+import { Posts } from './post.entity';
+import { Users } from './user.entity';
 
 @Entity('post-reactions')
 export class PostReactions extends NumberPkEntity {
-  @Column({ type: 'int', description: '게시물 ID' })
-  post_id: number;
+  @ManyToOne(() => Posts, (post) => post.reactions)
+  post: Posts;
 
-  @Column({ type: 'int', description: '사용자 ID' })
-  user_id: number;
+  @ManyToOne(() => Users, (user) => user.reactions)
+  user: Users;
 
   @Column({
-    type: 'string',
-    enum: REACTION_TYPE,
+    type: 'boolean',
     nullable: false,
-    description: '반응 유형',
+    description: '좋아요 여부',
   })
-  reaction_type: REACTION_TYPE;
+  like: boolean;
 }

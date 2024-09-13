@@ -1,8 +1,10 @@
-import { Entity, OneToMany } from 'typeorm';
+import { Entity, OneToMany, ManyToOne } from 'typeorm';
 
 import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
 import { Votes } from './vote.entity';
+import { PostReactions } from './post.reaction.entity';
+import { Users } from './user.entity';
 
 @Entity('posts')
 export class Posts extends NumberPkEntity {
@@ -33,4 +35,10 @@ export class Posts extends NumberPkEntity {
 
   @OneToMany(() => Votes, (vote) => vote.post, { cascade: true })
   votes: Votes[];
+
+  @OneToMany(() => PostReactions, (reaction) => reaction.post)
+  reactions: PostReactions[];
+
+  @ManyToOne(() => Users, (user) => user.posts)
+  user: Users;
 }

@@ -4,6 +4,8 @@ import { Column } from '../../decorators/column.decorator';
 import { NumberPkEntity } from '../abstract.entity';
 import { MBTI } from 'src/users/types/mbti.type';
 import { Comments } from './comment.entity';
+import { Posts } from './post.entity';
+import { PostReactions } from './post.reaction.entity';
 
 @Entity('users')
 export class Users extends NumberPkEntity {
@@ -30,27 +32,33 @@ export class Users extends NumberPkEntity {
   @Column({ type: 'varchar',enum: MBTI, length: 50, description: 'profile의 닉네임' , nullable: true})
   mbti: string;
 
-  // prettier-ignore
-  @Column({
-    name: 'e_i_ratio',
-    type: 'int',
-    nullable: true,
-    description: 'E와 I의 비율',
-  })
-  eiRatio?: number;
+  // // prettier-ignore
+  // @Column({
+  //   name: 'e_i_ratio',
+  //   type: 'int',
+  //   nullable: true,
+  //   description: 'E와 I의 비율',
+  // })
+  // eiRatio?: number;
 
-  // prettier-ignore
-  @Column({ name: 'n_s_ratio', type: 'int', nullable: true, description: 'N과 S의 비율' })
-  nsRatio?: number;
+  // // prettier-ignore
+  // @Column({ name: 'n_s_ratio', type: 'int', nullable: true, description: 'N과 S의 비율' })
+  // nsRatio?: number;
 
-  // prettier-ignore
-  @Column({ name: 'f_t_ratio', type: 'int', nullable: true, description: 'F와 T의 비율' })
-  ftRatio?: number;
+  // // prettier-ignore
+  // @Column({ name: 'f_t_ratio', type: 'int', nullable: true, description: 'F와 T의 비율' })
+  // ftRatio?: number;
 
-  // prettier-ignore
-  @Column({ name: 'p_j_ratio', type: 'int', nullable: true, description: 'P와 J의 비율' })
-  pjRatio?: number;
+  // // prettier-ignore
+  // @Column({ name: 'p_j_ratio', type: 'int', nullable: true, description: 'P와 J의 비율' })
+  // pjRatio?: number;
 
   @OneToMany(() => Comments, (comment) => comment.user)
-  comments: Comments[]; // 사용자가 작성한 댓글 목록
+  comments: Comments[];
+
+  @OneToMany(() => Posts, (post) => post.user)
+  posts: Posts[];
+
+  @OneToMany(() => PostReactions, (reaction) => reaction.user)
+  reactions: PostReactions[];
 }

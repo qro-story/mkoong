@@ -37,7 +37,7 @@ export class CreatePostDTO {
     type: 'array',
     schema: VotePostDTO,
     description: '투표 선택지 목록',
-    example: [{ content: '선택지 1' }, { content: '선택지 2' }],
+    example: [{ option: '선택지 1' }, { option: '선택지 2' }],
   })
   voteOptions: VoteOptionDTO[];
 }

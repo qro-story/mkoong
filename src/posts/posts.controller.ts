@@ -9,6 +9,7 @@ import { CreateCommentDTO } from 'src/comments/dto/comment.dto';
 import { CommentsService } from 'src/comments/comments.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CommentListRO } from 'src/comments/dto/comment.ro';
+import { PostRO } from './dto/post.ro';
 
 @ApiTags('Posts')
 @Controller('posts')
@@ -77,6 +78,7 @@ export class PostsController {
     auth: true,
     transactional: true,
     summary: '게시글 생성',
+    transform: PostRO,
   })
   async create(@UserInfo() user: TokenPayload, @Body() dto: CreatePostDTO) {
     const { id: userId } = user;

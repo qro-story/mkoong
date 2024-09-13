@@ -32,19 +32,21 @@ export class PostsService extends AbstractRepository<Posts> {
   }
 
   async createPosts(userId: number, dto: CreatePostDTO) {
-    await this.userService.getUserById(userId);
+    const user = await this.userService.getUserById(userId);
 
     const { title, content, voteOptions } = dto;
+    console.log('voteOptions : ', typeof voteOptions);
 
     const post = this.postsRepository.create({
       userId,
       content,
       title,
+      user,
     });
 
     // 투표 옵션 생성
     if (voteOptions && voteOptions.length > 0) {
-      post.votes = voteOptions.map((voteOption) =>
+      post.votes = voteOptions!.map((voteOption) =>
         this.votesRepository.create({
           option: voteOption.option,
           post,
@@ -54,6 +56,7 @@ export class PostsService extends AbstractRepository<Posts> {
 
     await this.postsRepository.save(post);
 
+    console.log(post);
     return post;
   }
 }

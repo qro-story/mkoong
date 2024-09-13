@@ -118,6 +118,16 @@ export class UsersController {
     const { id } = user;
     return this.usersService.getUserPosts(+id);
   }
+  @Route({
+    path: '/:id',
+    method: HttpMethodEnum.GET,
+    auth: true,
+    summary: '유저 정보 가져오기',
+    transform: PostRO,
+  })
+  getUserById(@Param('id') id: string) {
+    return this.usersService.getUserById(+id);
+  }
 
   @Route({
     path: '/',
