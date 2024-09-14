@@ -1,74 +1,90 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# github에서 Repository
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+```ts
+git clone https://github.com/DDD-Community/DDD-11-AppleRoid-BE.git
+```
+명령어를 통해 로컬에 프로젝트를 복제합니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## .env 파일 설정를 추가로 생성.
+```
+# 서버 포트
+SERVER_PORT=3000
 
-## Description
+# Mysql DB 설정
+DB_MYSQL_HOST=localhost
+DB_MYSQL_PORT=3306
+DB_MYSQL_DATABASE=mkoong
+DB_MYSQL_USERNAME=root
+DB_MYSQL_PASSWORD=test1234
+DB_MYSQL_CHARSET=utf8mb4
+DB_MYSQL_TIMEZONE=+00:00
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# REDIS 관련 설정
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
 
-## Installation
+JWT_PHONE_SECRET=JWT_PHONE_SECRET
+JWT_PHONE_EXPIRED=5m
 
-```bash
-$ yarn install
+JWT_ACCESS_SECRET=JWT_ACCESS_SECRET
+JWT_REFRESH_SECRET=JWT_REFRESH_SECRET
+
+JWT_ACCESS_EXPIRED=1h
+JWT_REFRESH_EXPIRED=3d
+
 ```
 
-## Running the app
+## Docker 설치 및 실행 (Mac)
 
-```bash
-# development
-$ yarn run start
+1. Docker Desktop 다운로드
+   - [Docker 공식 웹사이트](https://www.docker.com/products/docker-desktop)에 접속합니다.
+   - "Download for Mac" 버튼을 클릭하여 Docker Desktop 설치 파일을 다운로드합니다.
 
-# watch mode
-$ yarn run start:dev
+2. Docker Desktop 설치
+   - 다운로드한 `.dmg` 파일을 더블클릭하여 실행합니다.
+   - Docker 아이콘을 Applications 폴더로 드래그하여 설치를 완료합니다.
 
-# production mode
-$ yarn run start:prod
-```
+3. Docker Desktop 실행
+   - Applications 폴더에서 Docker를 찾아 더블클릭하여 실행합니다.
+   - 처음 실행 시 시스템 권한을 요구할 수 있으며, 관리자 비밀번호를 입력하여 권한을 부여합니다.
 
-## Test
+4. Docker 실행 확인
+   - Docker Desktop이 실행되면 상단 메뉴바에 고래 아이콘이 나타납니다.
+   - 터미널을 열고 다음 명령어를 입력하여 Docker가 정상적으로 설치되었는지 확인합니다:
+     ```
+     docker --version
+     docker-compose --version
+     ```
 
-```bash
-# unit tests
-$ yarn run test
+5. Docker 사용 시작
+   - 이제 Docker를 사용하여 컨테이너를 생성하고 관리할 수 있습니다.
+   - 예를 들어, 다음 명령어로 간단한 Hello World 컨테이너를 실행할 수 있습니다:
+     ```
+     docker run hello-world
+     ```
 
-# e2e tests
-$ yarn run test:e2e
+이제 Mac에서 Docker를 사용할 준비가 완료되었습니다. Docker Desktop을 통해 컨테이너를 관리하고 개발 환경을 구축할 수 있습니다.
 
-# test coverage
-$ yarn run test:cov
-```
+# 도커 컴포즈를 통해 인스턴스 실행
 
-## Support
+1. 프로젝트 루트 디렉토리로 이동합니다.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+2. 다음 명령어를 실행하여 Docker 컨테이너를 빌드하고 실행합니다:
+   ```
+   docker compose up -d // 를 통해서 백그라운드에서 실행
+   ```
 
-## Stay in touch
+3. 컨테이너가 성공적으로 실행되면, 다음과 같은 서비스들이 구동됩니다: ( 도커 앱에서 확인할 수 있음 )
+   - MySQL 데이터베이스 (포트: 3306)
+   - Redis (포트: 6379)
+   - Node.js 애플리케이션 서버 (포트: 3000)
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+4. 애플리케이션의 스웨거에 접근하려면 웹 브라우저에서 `http://localhost:3000/docs#/`으로 이동합니다.
 
-## License
+5. 컨테이너를 중지하고 삭제하려면 다음 명령어를 사용합니다:
+   ```
+   docker-compose down
+   ```
 
-Nest is [MIT licensed](LICENSE).
-# m_koong
+주의: Docker 컨테이너를 실행하기 전에 `.env` 파일이 프로젝트 루트 디렉토리에 있는지 확인하세요. 이 파일에는 데이터베이스 연결 정보와 기타 환경 변수가 포함되어 있습니다.
