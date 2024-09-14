@@ -31,7 +31,6 @@ const getEnumKeyByValue = (_enum: any, _value: any) => {
   const indexOfS = Object.values(_enum).indexOf(_value as unknown);
 
   const key = Object.keys(_enum)[indexOfS];
-
   return key || _value;
 };
 

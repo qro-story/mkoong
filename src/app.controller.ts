@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { AppService } from './app.service';
-import { Route } from '@libs/core/decorators';
+import { HttpMethodEnum, Route } from '@libs/core/decorators';
 
 @Controller()
 export class AppController {
@@ -8,9 +8,10 @@ export class AppController {
 
   @Route({
     path: '/',
-    method: 'POST',
+    method: HttpMethodEnum.GET,
+    summary: '서버 테스트',
   })
-  getHello(): string {
+  postHello(): string {
     return this.appService.getHello();
   }
 }
