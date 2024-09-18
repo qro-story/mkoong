@@ -22,8 +22,6 @@ jobs:
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
-        run: |
-          eb deploy --label ${{ github.sha }} # Git commit SHA 기반 고유 버전 태그
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -33,3 +31,7 @@ jobs:
           version_description: ${{ github.event.head_commit.message }}
           region: ap-northeast-2
           deployment_package: ${{ github.sha }}.zip
+
+      - name: Update EB environment
+        run: |
+          eb deploy --label ${{ github.sha }} # Git commit SHA 기반 고유 버전 태그
