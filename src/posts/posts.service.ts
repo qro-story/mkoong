@@ -56,7 +56,6 @@ export class PostsService extends AbstractRepository<Posts> {
 
     await this.postsRepository.save(post);
 
-    console.log(post);
     return post;
   }
 
