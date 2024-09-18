@@ -19,6 +19,9 @@ jobs:
           cache: 'yarn'
       - name: Generate deployment package
         run: zip -r ${{ github.sha }}.zip . -x "*.git*" node_modules
+      - name: Generate unique version label
+        id: generate_version
+        run: echo "version=$(date +'%Y%m%d%H%M%S')-${{ github.sha }}" >> $GITHUB_OUTPUT
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
@@ -34,4 +37,4 @@ jobs:
 
       - name: Update EB environment
         run: |
-          eb deploy --label ${{ github.sha }} # Git commit SHA 기반 고유 버전 태그
+          eb deploy --label ${{ steps.generate_version.outputs.version }}
