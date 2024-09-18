@@ -19,6 +19,7 @@ jobs:
           cache: 'yarn'
       - name: Generate deployment package
         run: zip -r ${{ github.sha }}.zip . -x "*.git*" node_modules
+
       - name: Generate unique version label
         id: generate_version
         run: echo "version=$(date +'%Y%m%d%H%M%S')-${{ github.sha }}" >> $GITHUB_OUTPUT
@@ -30,7 +31,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: mkoong
           environment_name: Mkoong-env-4
-          version_label: ${{ github.sha }}
+          version_label: ${{ steps.generate_version.outputs.version }}
           version_description: ${{ github.event.head_commit.message }}
           region: ap-northeast-2
           deployment_package: ${{ github.sha }}.zip
