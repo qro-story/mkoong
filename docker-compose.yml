@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: qro2408/mkoong:${{ github.sha }}
+      dockerfile: qro2408/mkoong
     ports:
       - '3000:3000'
     depends_on:
