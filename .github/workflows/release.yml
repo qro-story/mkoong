@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: 18
           cache: 'yarn'
+
       - name: Generate deployment package
         run: zip -r ${{ github.sha }}.zip . -x "*.git*" node_modules
 
