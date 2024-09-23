@@ -16,9 +16,6 @@ jobs:
           node-version: 18
           cache: 'yarn'
 
-      - name: check docker secret key
-        run: echo ${{ secrets.DOCKER_USERNAME }}
-
       - name: login to docker hub
         uses: docker/login-action@v3
         with:
@@ -27,6 +24,9 @@ jobs:
 
       - name: Docker build
         run: docker build -t qro2408/mkoong:${{ github.sha }} .
+
+      - name: Set GITHUB_SHA environment variable
+        run: echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV # GitHub SHA를 환경 변수로 설정
 
       - name: Docker push
         run: docker push qro2408/mkoong:${{ github.sha }}
