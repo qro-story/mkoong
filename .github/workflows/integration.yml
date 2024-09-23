@@ -23,7 +23,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker build
-        run: docker build -t qro2408/mkoong:latest .
+        run: docker build -t qro2408/mkoong:${{ github.sha }} .
 
       - name: Set GITHUB_SHA environment variable
         run: echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV # GitHub SHA를 환경 변수로 설정
