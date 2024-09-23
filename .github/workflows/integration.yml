@@ -17,4 +17,4 @@ jobs:
           node-version: 18
           cache: 'yarn'
       - run: yarn
-      - run: yarn build --if-present
+      - run: yarn build
