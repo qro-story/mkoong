@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: qro2408/mkoong:d0c9f3033689c8c30273054ddc792ccf8c84e82a
+      dockerfile: qro2408/mkoong:latest
     ports:
       - '3000:3000'
     depends_on:
@@ -14,7 +14,7 @@ services:
         condition: service_healthy
 
     environment:
-      - DB_MYSQL_HOST=localhost
+      - DB_MYSQL_HOST=mysql
       - DB_MYSQL_PORT=3307
       - DB_MYSQL_USERNAME=root
       - DB_MYSQL_PASSWORD=test1234
