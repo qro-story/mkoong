@@ -21,7 +21,7 @@ jobs:
         run: npm install
 
       - name: Genrate Deployment Package
-        run: zip -r ${{ github.sha }}.zip .
+        run: zip -r deploy.zip .
 
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
@@ -32,7 +32,7 @@ jobs:
           environment_name: Mkoong-node
           version_label: ${{ github.sha }}
           region: ap-northeast-2
-          deployment_package: ${{ github.sha }}.zip
+          deployment_package: deploy.zip
 
   # 우선은 노드로 배포 진행하기 위해 잠시 주석
   # deploy:
