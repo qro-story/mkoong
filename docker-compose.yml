@@ -25,7 +25,7 @@ services:
       - JWT_PHONE_EXPIRED=30m
 
     volumes:
-      - .:/usr/src/app
+      - .:/app
 
   mysql:
     image: mysql:8.0
