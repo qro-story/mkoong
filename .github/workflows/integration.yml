@@ -25,12 +25,9 @@ jobs:
       - name: Docker build
         run: docker build -t qro2408/mkoong:latest .
 
-      # - name: Set GITHUB_SHA environment variable
-      #   run: echo "GITHUB_SHA=${{ github.sha }}" >> $GITHUB_ENV # GitHub SHA를 환경 변수로 설정
-
-      # - name: Docker push
-      #   run: docker push qro2408/mkoong:${{ github.sha }}
-
       # latest 태그도 푸시
       - name: Docker push (latest)
         run: docker push qro2408/mkoong:latest
+
+      - name: Set workflow ID
+        run: echo "workflow_id=${{ github.run_id }}" >> $GITHUB_ENV
