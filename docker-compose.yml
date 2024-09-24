@@ -2,9 +2,7 @@ version: '3'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: qro2408/mkoong:latest
+    image: qro2408/mkoong:latest
     ports:
       - '3000:3000'
     depends_on:
